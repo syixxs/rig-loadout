@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Rig Loadout">
+  <title>Rig Loadout — Gladiator</title>
+  <style>
+    :root {
+      --bg: #1c1c1e;
+      --surface: #2c2c2e;
+      --surface2: #3a3a3c;
+      --border: #48484a;
+      --accent: #c8a86b;
+      --text: #f2f2f7;
+      --text2: #aeaeb2;
+      --green: #4a9c6d;
+      --amber: #e6962a;
+      --red: #ff453a;
+      --blue: #4da6ff;
+      --tab-h: 72px;
+      --hdr-h: 58px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      font-size: 16px; overflow: hidden; }
+    #app { display: flex; flex-direction: column; height: 100%; max-width: 430px; margin: 0 auto; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      height: var(--hdr-h); display: flex; align-items: center;
+      justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 10;
+    }
+    .hdr-left .title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .hdr-left .sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .hdr-pct { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1; }
+    .hdr-pct-lbl { font-size: 11px; color: var(--text2); text-align: right; }
+    .settings-btn { background: none; border: none; color: var(--text2);
+      font-size: 20px; padding: 10px; cursor: pointer; }
+
+    /* ── MAIN SCROLL ── */
+    main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); }
+    .tab-pane { display: none; padding-top: 8px; }
+    .tab-pane.active { display: block; }
+
+    /* ── SECTION CARDS ── */
+    .section { margin: 6px 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+    .sec-hdr {
+      width: 100%; background: none; border: none; color: var(--text);
+      display: flex; align-items: center; padding: 14px 14px; gap: 10px;
+      cursor: pointer; text-align: left; -webkit-appearance: none;
+    }
+    .sec-icon { font-size: 18px; flex-shrink: 0; }
+    .sec-name { flex: 1; font-size: 15px; font-weight: 600; }
+    .sec-badge {
+      font-size: 12px; background: var(--surface2); color: var(--text2);
+      padding: 3px 9px; border-radius: 10px; min-width: 46px; text-align: center; flex-shrink: 0;
+    }
+    .sec-badge.partial { background: var(--amber); color: #000; }
+    .sec-badge.done { background: var(--green); color: #fff; }
+    .chevron { color: var(--text2); font-size: 18px; transition: transform 0.2s; flex-shrink: 0; }
+    .section.open .chevron { transform: rotate(90deg); }
+    .sec-body { display: none; border-top: 1px solid var(--border); }
+    .section.open .sec-body { display: block; }
+
+    /* ── ITEMS ── */
+    .item {
+      display: flex; align-items: center; padding: 13px 14px; gap: 12px;
+      cursor: pointer; border-bottom: 1px solid var(--border); min-height: 52px;
+    }
+    .item:last-child { border-bottom: none; }
+    .item input[type=checkbox] { display: none; }
+    .chk {
+      width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--border);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; background: var(--surface2);
+    }
+    .item input:checked ~ .chk { background: var(--green); border-color: var(--green); }
+    .item input:checked ~ .chk::after { content: '✓'; color: #fff; font-size: 15px; font-weight: 700; }
+    .item-lbl { flex: 1; font-size: 15px; line-height: 1.3; }
+    .item input:checked ~ .item-lbl { color: var(--text2); text-decoration: line-through; }
+    .item-note { font-size: 12px; color: var(--text2); display: block; margin-top: 2px; }
+
+    /* ── DIVIDER LABELS ── */
+    .divider-lbl { padding: 14px 14px 4px; font-size: 12px; font-weight: 600;
+      color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; }
+
+    /* ── BED MAP ── */
+    .bedmap-wrap { padding: 12px 14px; }
+    .bedmap-tip { font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 8px; }
+    #bed-svg { width: 100%; max-width: 360px; display: block; margin: 0 auto; }
+    .bed-zone { cursor: pointer; transition: filter 0.15s; }
+    .bed-zone:active { filter: brightness(1.5); }
+    .zone-popup {
+      margin-top: 12px; background: var(--surface); border-radius: 12px; overflow: hidden;
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .popup-hdr {
+      padding: 13px 14px; font-weight: 600; font-size: 15px;
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .popup-close { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; padding: 4px; }
+
+    /* ── CALCULATOR CARDS ── */
+    .calc-card { margin: 6px 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+    .calc-hdr { padding: 13px 14px; font-weight: 600; font-size: 14px;
+      color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border); }
+    .calc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+    }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-lbl { font-size: 14px; color: var(--text2); flex: 1; }
+    .calc-val { font-size: 14px; font-weight: 600; }
+    .calc-val.pos { color: var(--green); }
+    .calc-val.neg { color: var(--red); }
+    .calc-val.warn { color: var(--amber); }
+    .calc-row.total-row { background: var(--surface2); }
+    .calc-row.total-row .calc-lbl { color: var(--text); font-weight: 600; }
+
+    /* ── STAT BOXES ── */
+    .stat-row { display: flex; gap: 8px; margin: 6px 14px; }
+    .stat-box { flex: 1; background: var(--surface); border-radius: 12px; padding: 14px 12px; text-align: center; }
+    .stat-num { font-size: 26px; font-weight: 800; line-height: 1.1; }
+    .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+    /* ── SETTINGS CONTROLS ── */
+    .settings-card { margin: 6px 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+    .settings-card-hdr { padding: 10px 14px; font-size: 12px; font-weight: 600;
+      color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border); }
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-lbl { font-size: 15px; }
+    .stepper { display: flex; align-items: center; gap: 14px; }
+    .stepper button {
+      width: 34px; height: 34px; border-radius: 50%; border: none;
+      background: var(--surface2); color: var(--text); font-size: 22px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;
+    }
+    .stepper-val { min-width: 22px; text-align: center; font-weight: 700; font-size: 16px; }
+    .toggle-grp { display: flex; background: var(--surface2); border-radius: 8px; overflow: hidden; }
+    .toggle-grp button {
+      flex: 1; padding: 7px 10px; border: none; background: none;
+      color: var(--text2); font-size: 13px; cursor: pointer; white-space: nowrap;
+    }
+    .toggle-grp button.on { background: var(--accent); color: #000; font-weight: 700; border-radius: 7px; }
+    .sw {
+      width: 52px; height: 30px; background: var(--surface2); border-radius: 15px;
+      border: none; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .sw::after {
+      content: ''; width: 26px; height: 26px; border-radius: 50%; background: #fff;
+      position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    .sw.on { background: var(--green); }
+    .sw.on::after { transform: translateX(22px); }
+    .info-card { margin: 6px 14px; background: var(--surface); border-radius: 12px;
+      padding: 14px; font-size: 13px; color: var(--text2); line-height: 1.6; }
+    .info-card strong { color: var(--text); }
+
+    /* ── RESET BUTTON ── */
+    .reset-btn {
+      margin: 12px 14px 4px; width: calc(100% - 28px); padding: 15px;
+      border: 1.5px solid var(--red); border-radius: 12px; background: none;
+      color: var(--red); font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── TAB BAR ── */
+    nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; background: var(--surface);
+      border-top: 1px solid var(--border); display: flex;
+      height: var(--tab-h); padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100;
+    }
+    .tab-btn {
+      flex: 1; background: none; border: none; color: var(--text2); font-size: 10px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer; padding: 6px 0; transition: color 0.15s;
+    }
+    .tab-btn.on { color: var(--accent); }
+    .tab-icon { font-size: 22px; line-height: 1; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 200; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    .modal-overlay.open { display: block; }
+    .modal-box {
+      margin: 60px 14px 40px; background: var(--surface); border-radius: 16px; overflow: hidden;
+    }
+    .modal-hdr {
+      padding: 16px 14px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-hdr .title { font-size: 17px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--text2); font-size: 26px; cursor: pointer; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══ HEADER ═══ -->
+  <header>
+    <div class="hdr-left">
+      <div class="title">⚙ Gladiator Loadout</div>
+      <div class="sub" id="hdr-sub">1 person · 2 days</div>
+    </div>
+    <div style="text-align:right">
+      <div class="hdr-pct" id="hdr-pct">0%</div>
+      <div class="hdr-pct-lbl">ready</div>
+    </div>
+    <button class="settings-btn" onclick="openModal()">⚙️</button>
+  </header>
+
+  <!-- ═══ MAIN ═══ -->
+  <main>
+
+    <!-- ── CHECKLIST TAB ── -->
+    <div id="tab-checklist" class="tab-pane active">
+      <div id="checklist-root"></div>
+      <button class="reset-btn" onclick="doReset()">↺  New Trip — Reset All Checks</button>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- ── BED MAP TAB ── -->
+    <div id="tab-bedmap" class="tab-pane">
+      <div class="bedmap-wrap">
+        <div class="bedmap-tip">Top-down view — cab at top, tailgate at bottom. Tap a zone.</div>
+
+        <svg id="bed-svg" viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Bed shell -->
+          <rect x="4" y="4" width="292" height="442" rx="8" fill="#252527" stroke="#555" stroke-width="1.5"/>
+
+          <!-- Cab wall band -->
+          <rect x="4" y="4" width="292" height="38" rx="8" fill="#333"/>
+          <rect x="4" y="28" width="292" height="14" fill="#333"/>
+          <text x="150" y="26" text-anchor="middle" fill="#888" font-size="11"
+                font-family="-apple-system,sans-serif" font-weight="600">← CAB WALL — MOPAR RAIL →</text>
+
+          <!-- Anchor points (4 on cab rail) -->
+          <circle cx="60"  cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="115" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="185" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="240" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+
+          <!-- ── POWER ZONE (driver/left, cab-forward) ── -->
+          <rect id="sv-power" class="bed-zone" data-zone="power"
+                x="4" y="46" width="118" height="150"
+                fill="#2a4d6a" rx="5"/>
+          <text x="63" y="114" text-anchor="middle" fill="#9ecfee"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">⚡ POWER</text>
+          <text x="63" y="130" text-anchor="middle" fill="#9ecfee"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Jackery 2000 v2</text>
+          <text id="svb-power" x="63" y="146" text-anchor="middle" fill="#9ecfee"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
+
+          <!-- ── SOLAR ZONE (center, cab-forward) ── -->
+          <rect id="sv-solar" class="bed-zone" data-zone="solar"
+                x="122" y="46" width="82" height="130"
+                fill="#5a4a1a" rx="5"/>
+          <text x="163" y="108" text-anchor="middle" fill="#ffe07a"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">☀ SOLAR</text>
+          <text x="163" y="123" text-anchor="middle" fill="#ffe07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">200W × 2</text>
+          <text id="svb-solar" x="163" y="138" text-anchor="middle" fill="#ffe07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
+
+          <!-- ── FRIDGE ZONE (passenger/right, cab-forward) ── -->
+          <rect id="sv-fridge" class="bed-zone" data-zone="fridge"
+                x="204" y="46" width="92" height="170"
+                fill="#1c5a3a" rx="5"/>
+          <text x="250" y="124" text-anchor="middle" fill="#80f0b0"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🧊 FRIDGE</text>
+          <text x="250" y="140" text-anchor="middle" fill="#80f0b0"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">CFX5 45</text>
+          <text id="svb-fridge" x="250" y="155" text-anchor="middle" fill="#80f0b0"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
+
+          <!-- ── POWER CONNECT (driver, below power zone) ── -->
+          <rect id="sv-power-connect" class="bed-zone" data-zone="power-connect"
+                x="4" y="196" width="118" height="62"
+                fill="#1e3a58" rx="5"/>
+          <text x="63" y="224" text-anchor="middle" fill="#7ab4d8"
+                font-size="11" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🔌 CONNECTIONS</text>
+          <text id="svb-power-connect" x="63" y="240" text-anchor="middle" fill="#7ab4d8"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/2</text>
+
+          <!-- ── KITCHEN ZONE (passenger + center, mid) ── -->
+          <rect id="sv-kitchen" class="bed-zone" data-zone="kitchen"
+                x="122" y="176" width="174" height="130"
+                fill="#5a3c1a" rx="5"/>
+          <text x="209" y="234" text-anchor="middle" fill="#f5c07a"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🍳 KITCHEN</text>
+          <text x="209" y="250" text-anchor="middle" fill="#f5c07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">RTIC + Pecos Table</text>
+          <text id="svb-kitchen" x="209" y="266" text-anchor="middle" fill="#f5c07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/5</text>
+
+          <!-- Open storage label (driver mid) -->
+          <rect x="4" y="258" width="118" height="70" fill="#232325" rx="5"/>
+          <text x="63" y="296" text-anchor="middle" fill="#4a4a4e"
+                font-size="11" font-family="-apple-system,sans-serif">[ open ]</text>
+
+          <!-- ── Wheel wells ── -->
+          <ellipse cx="44"  cy="362" rx="42" ry="26" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
+          <ellipse cx="260" cy="362" rx="42" ry="26" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
+
+          <!-- ── FIRE ZONE (center-pass, mid-rear) ── -->
+          <rect id="sv-fire" class="bed-zone" data-zone="fire"
+                x="122" y="306" width="174" height="90"
+                fill="#6a2e0c" rx="5"/>
+          <text x="209" y="348" text-anchor="middle" fill="#f5956a"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🔥 FIRE &amp; COOK</text>
+          <text x="209" y="363" text-anchor="middle" fill="#f5956a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Lavabox + Breeo</text>
+          <text id="svb-fire" x="209" y="378" text-anchor="middle" fill="#f5956a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
+
+          <!-- ── PROPANE ZONE (driver rear, between wheel wells) ── -->
+          <rect id="sv-propane" class="bed-zone" data-zone="propane"
+                x="4" y="328" width="88" height="80"
+                fill="#3c3c40" rx="5"/>
+          <text x="48" y="365" text-anchor="middle" fill="#c0c0c8"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🛢 LPG</text>
+          <text id="svb-propane" x="48" y="381" text-anchor="middle" fill="#c0c0c8"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/4</text>
+
+          <!-- Tailgate band -->
+          <rect x="4" y="408" width="292" height="38" rx="5" fill="#2a2a2c"/>
+          <text x="150" y="430" text-anchor="middle" fill="#555" font-size="10"
+                font-family="-apple-system,sans-serif">↓  TAILGATE  ↓</text>
+          <text x="14" y="444" fill="#444" font-size="9" font-family="-apple-system,sans-serif">DRIVER</text>
+          <text x="255" y="444" fill="#444" font-size="9" font-family="-apple-system,sans-serif">PASS.</text>
+
+          <!-- Awning note -->
+          <text x="290" y="395" fill="#5a4a2a" font-size="9" text-anchor="end"
+                font-family="-apple-system,sans-serif">270° awning →</text>
+        </svg>
+
+        <!-- Zone popup -->
+        <div id="zone-popup" class="zone-popup" style="display:none">
+          <div class="popup-hdr">
+            <span id="popup-title">Zone</span>
+            <button class="popup-close" onclick="closeZonePopup()">✕</button>
+          </div>
+          <div id="popup-items"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── POWER TAB ── -->
+    <div id="tab-power" class="tab-pane">
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num">2,042</div>
+          <div class="stat-lbl">Wh Jackery capacity</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--green)" id="pw-solar-num">1,700</div>
+          <div class="stat-lbl">Wh/day solar est.</div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-hdr">Daily Loads</div>
+        <div class="calc-row">
+          <div class="calc-lbl">Dometic CFX5 45 (avg 45W)</div>
+          <div class="calc-val">1,080 Wh</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="pw-phones-lbl">iPhones (1×)</div>
+          <div class="calc-val" id="pw-phones-val">40 Wh</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Steam Deck</div>
+          <div class="calc-val">75 Wh</div>
+        </div>
+        <div id="pw-ac-row" class="calc-row" style="display:none">
+          <div class="calc-lbl" id="pw-ac-lbl">Zero Breeze (8h)</div>
+          <div class="calc-val" id="pw-ac-val">—</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Total daily draw</div>
+          <div class="calc-val" id="pw-total">—</div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-hdr">Net Balance</div>
+        <div class="calc-row">
+          <div class="calc-lbl">Solar harvest (400W, 5h, 85%)</div>
+          <div class="calc-val pos">+1,700 Wh/day</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Daily draw</div>
+          <div class="calc-val" id="pw-draw-lbl">—</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Net solar balance</div>
+          <div class="calc-val" id="pw-net">—</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Battery-only reserve (no sun)</div>
+          <div class="calc-val" id="pw-reserve">—</div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-hdr">Zero Breeze Mark 3 AC Unit</div>
+        <div class="setting-row">
+          <div class="setting-lbl">Loaded this trip</div>
+          <button id="sw-ac" class="sw" onclick="toggle('acLoaded')"></button>
+        </div>
+        <div id="ac-mode-wrap" class="setting-row" style="display:none">
+          <div class="setting-lbl">Mode</div>
+          <div class="toggle-grp">
+            <button id="acm-sleep"  onclick="setACMode('sleep')">Sleep<br><small>150W</small></button>
+            <button id="acm-medium" onclick="setACMode('medium')">Med<br><small>300W</small></button>
+            <button id="acm-full"   onclick="setACMode('full')">Full<br><small>500W</small></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        ☀️ <strong>Solar covers most loads</strong> on a typical desert day without the AC. With AC in sleep mode nightly, you'll draw ~200–400 Wh net from the Jackery per night.<br><br>
+        🔋 The Zero Breeze Mark 3 Plus includes a <strong>built-in 1,022 Wh battery</strong> — it runs on that first before pulling from the Jackery, extending your reserve significantly.
+      </div>
+    </div>
+
+    <!-- ── WATER TAB ── -->
+    <div id="tab-water" class="tab-pane">
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num">6.8</div>
+          <div class="stat-lbl">gal total on board</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="wt-days-num" style="color:var(--blue)">—</div>
+          <div class="stat-lbl">days of water</div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-hdr">Water Sources</div>
+        <div class="calc-row">
+          <div class="calc-lbl">Leitner HydroPod</div>
+          <div class="calc-val">4.8 gal</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Rotopax 2 gal jerry can</div>
+          <div class="calc-val">2.0 gal</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Total potable</div>
+          <div class="calc-val">6.8 gal</div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-hdr">Daily Consumption</div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-drink-lbl">Drinking (1p × 1.0 gal)</div>
+          <div class="calc-val" id="wt-drink-val">1.0 gal</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-cook-lbl">Cooking &amp; cleaning (1p × 0.5)</div>
+          <div class="calc-val" id="wt-cook-val">0.5 gal</div>
+        </div>
+        <div class="setting-row" style="border-bottom:1px solid var(--border)">
+          <div class="setting-lbl" style="font-size:14px">Daily HydroPod shower</div>
+          <button id="sw-shower" class="sw" onclick="toggle('showShower')"></button>
+        </div>
+        <div id="wt-shower-row" class="calc-row" style="display:none">
+          <div class="calc-lbl" id="wt-shower-lbl">Shower (1p × 0.75 gal)</div>
+          <div class="calc-val">0.75 gal</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Total per day</div>
+          <div class="calc-val" id="wt-total-day">—</div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-hdr">Trip vs. Supply</div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-trip-lbl">Trip duration</div>
+          <div class="calc-val" id="wt-trip-need">—</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Water surplus / deficit</div>
+          <div class="calc-val" id="wt-surplus">—</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        💧 <strong>Grayl GeoPress</strong> supplements from streams or questionable sources — plan to use it for daytime trail drinking to preserve your tank.<br><br>
+        🚿 The HydroPod hand pump pressurizes in ~30 strokes. A quick rinse uses ≈0.5 gal; a full wash ≈0.75 gal. Count carefully on multi-day trips.
+      </div>
+    </div>
+
+  </main><!-- end main -->
+
+  <!-- ═══ TAB BAR ═══ -->
+  <nav>
+    <button class="tab-btn on" data-tab="checklist" onclick="switchTab('checklist')">
+      <span class="tab-icon">☑️</span><span>Checklist</span>
+    </button>
+    <button class="tab-btn" data-tab="bedmap" onclick="switchTab('bedmap')">
+      <span class="tab-icon">🗺️</span><span>Bed Map</span>
+    </button>
+    <button class="tab-btn" data-tab="power" onclick="switchTab('power')">
+      <span class="tab-icon">⚡</span><span>Power</span>
+    </button>
+    <button class="tab-btn" data-tab="water" onclick="switchTab('water')">
+      <span class="tab-icon">💧</span><span>Water</span>
+    </button>
+  </nav>
+
+</div><!-- end app -->
+
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div id="modal" class="modal-overlay" onclick="modalBgClick(event)">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <span class="title">Trip Settings</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="settings-card" style="margin:0;border-radius:0">
+      <div class="setting-row">
+        <div class="setting-lbl">People on trip</div>
+        <div class="stepper">
+          <button onclick="adj('guests',-1)">−</button>
+          <span class="stepper-val" id="s-guests">1</span>
+          <button onclick="adj('guests',1)">+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-lbl">Trip duration (days)</div>
+        <div class="stepper">
+          <button onclick="adj('tripDays',-1)">−</button>
+          <span class="stepper-val" id="s-days">2</span>
+          <button onclick="adj('tripDays',1)">+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-lbl">Rotopax</div>
+        <div class="toggle-grp">
+          <button id="rot-water" onclick="setRotopax('water')">💧 Water</button>
+          <button id="rot-gas"   onclick="setRotopax('gas')">⛽ Gas</button>
+        </div>
+      </div>
+      <div class="setting-row" style="border-bottom:none">
+        <div class="setting-lbl">Permissive location<br>
+          <span style="font-size:12px;color:var(--text2)">Adds rifle &amp; shotgun to security kit</span>
+        </div>
+        <button id="sw-perm" class="sw" onclick="toggle('permissive')"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+//  DATA
+// ════════════════════════════════════════════════
+
+const SECTIONS = [
+  { id:'rack', icon:'🔧', name:'Rack Check',
+    items:[
+      {id:'r1', lbl:'Condor Overland tent',      note:'Stowed — all zippers closed'},
+      {id:'r2', lbl:'Litewing 270 awning',        note:'Stowed and secured to rack'},
+      {id:'r3', lbl:'GearPod XL',                 note:'Loaded and locked'},
+      {id:'r4', lbl:'MAXTRAX panels',             note:'Mounted on GearPod rear bracket'},
+      {id:'r5', lbl:'Rotopax',                    note:'', dynamic:'rotopax'},
+      {id:'r6', lbl:'DMOS Delta Pro shovel',       note:'Mounted on passenger rail bracket'},
+      {id:'r7', lbl:'Gerber camp axe',            note:'Mounted on passenger rail bracket'},
+      {id:'r8', lbl:'HydroPod',                   note:'Ready — filled from jerry can'},
+      {id:'r9', lbl:'Helinox Tactical chair',     note:'Stowed in GearPod'},
+    ]
+  },
+  { id:'tent', icon:'⛺', name:'Tent Interior', dynamic:'tent', items:[] },
+  { id:'power', icon:'⚡', name:'Power Zone', zone:'power',
+    items:[
+      {id:'pw1', lbl:'Jackery Explorer 2000 v2',  note:'Loaded — driver side, cab-forward'},
+      {id:'pw2', lbl:'Jackery strapped down',     note:'Secured to MOPAR cab wall anchor'},
+      {id:'pw3', lbl:'Jackery charge verified',   note:'Check display — top off if below 80%'},
+    ]
+  },
+  { id:'solar', icon:'☀️', name:'Solar Panels', zone:'solar',
+    items:[
+      {id:'sol1', lbl:'SolarSaga 200W — Panel 1', note:'Flat in bed, center cab-side'},
+      {id:'sol2', lbl:'SolarSaga 200W — Panel 2', note:'Flat, stacked on Panel 1'},
+      {id:'sol3', lbl:'Panels protected',         note:'Sandwiched between Jackery and fridge'},
+    ]
+  },
+  { id:'fridge', icon:'🧊', name:'Fridge Zone', zone:'fridge',
+    items:[
+      {id:'fr1', lbl:'Dometic CFX5 45',            note:'Loaded — passenger side, cab-forward'},
+      {id:'fr2', lbl:'Fridge strapped down',       note:'Secured to MOPAR cab wall anchor'},
+      {id:'fr3', lbl:'Fridge powered on',          note:'Display active — temp set and verified'},
+    ]
+  },
+  { id:'power-connect', icon:'🔌', name:'Power Connections', zone:'power-connect',
+    items:[
+      {id:'pc1', lbl:'Jackery → Fridge DC cable',  note:'Connected and routed cleanly'},
+      {id:'pc2', lbl:'SolarSaga charging cables',  note:'Staged and accessible for camp setup'},
+    ]
+  },
+  { id:'kitchen', icon:'🍳', name:'Kitchen & Camp', zone:'kitchen',
+    items:[
+      {id:'kt1', lbl:'RTIC 45L pantry',            note:'Loaded and stocked — passenger mid'},
+      {id:'kt2', lbl:'AeroPress',                  note:'In RTIC'},
+      {id:'kt3', lbl:'Coffee supply',              note:'In RTIC'},
+      {id:'kt4', lbl:'Cookware',                   note:'In RTIC'},
+      {id:'kt5', lbl:'Pecos table',                note:'Loaded flat — legs stored inside surface'},
+    ]
+  },
+  { id:'fire', icon:'🔥', name:'Fire & Cooking', zone:'fire',
+    items:[
+      {id:'fi1', lbl:'Lavabox campfire',            note:'In carry bag — loaded'},
+      {id:'fi2', lbl:'Breeo Outpost 19"',           note:'In carry bag — loaded'},
+      {id:'fi3', lbl:'Wood / charcoal',             note:'Loaded in Overland Gear Guy bag at tailgate'},
+    ]
+  },
+  { id:'propane', icon:'🛢️', name:'Propane Zone', zone:'propane',
+    items:[
+      {id:'pr1', lbl:'20 lb propane tank',         note:'Upright — driver rear corner'},
+      {id:'pr2', lbl:'Non-slip mat',               note:'Under foot ring'},
+      {id:'pr3', lbl:'Strap #1',                   note:'Through foot ring to bed cleat'},
+      {id:'pr4', lbl:'Strap #2',                   note:'Around tank body to opposite cleat'},
+    ]
+  },
+  { id:'cab', icon:'🎒', name:'Cab & Personal',
+    items:[
+      {id:'cb1', lbl:'Ruck',                        note:'Clothing + toiletries in back seat'},
+      {id:'cb2', lbl:'Security kit',               note:'Bandolier + IFAK — loaded and accessible'},
+      {id:'cb3', lbl:'Rifle',                       note:'Staged — permissive location', dynamic:'perm'},
+      {id:'cb4', lbl:'Shotgun',                    note:'Staged — permissive location', dynamic:'perm'},
+      {id:'cb5', lbl:'Headlamp',                   note:'In glove box'},
+      {id:'cb6', lbl:'Phone charged',              note:'Mounted — offline maps downloaded'},
+      {id:'cb7', lbl:'Steam Deck charged',         note:'Charged and packed'},
+    ]
+  },
+];
+
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+
+const DEFAULTS = {
+  guests:1, tripDays:2, permissive:false, rotopax:'water',
+  acLoaded:false, acMode:'sleep', showShower:false,
+};
+
+let S = { checked:{}, cfg:{ ...DEFAULTS } };
+let openSecs = new Set(['rack']);
+let activeZone = null;
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('rig_v2') || '{}');
+    S.checked = d.checked || {};
+    S.cfg = { ...DEFAULTS, ...(d.cfg || {}) };
+    if (d.openSecs) openSecs = new Set(d.openSecs);
+  } catch(e){}
+}
+function save() {
+  try { localStorage.setItem('rig_v2', JSON.stringify({
+    checked: S.checked, cfg: S.cfg, openSecs:[...openSecs]
+  })); } catch(e){}
+}
+
+// ════════════════════════════════════════════════
+//  ITEM RESOLUTION
+// ════════════════════════════════════════════════
+
+function resolveItems(sec) {
+  if (sec.dynamic === 'tent') {
+    const arr = [];
+    for (let i=1; i<=S.cfg.guests; i++) {
+      const s = S.cfg.guests===1 ? '' : ` — P${i}`;
+      arr.push({id:`t_bag_${i}`, lbl:`Sleeping bag / liner${s}`, note:'Load in Condor tent before departure'});
+      arr.push({id:`t_pil_${i}`, lbl:`Pillow${s}`,               note:'Load in Condor tent before departure'});
+    }
+    return arr;
+  }
+  return sec.items.filter(it => {
+    if (it.dynamic === 'perm') return S.cfg.permissive;
+    return true;
+  });
+}
+
+function secProgress(sec) {
+  const items = resolveItems(sec);
+  const done = items.filter(it => S.checked[it.id]).length;
+  return { done, total: items.length };
+}
+
+function totalProgress() {
+  let done=0, total=0;
+  SECTIONS.forEach(s => { const p=secProgress(s); done+=p.done; total+=p.total; });
+  return { done, total };
+}
+
+// ════════════════════════════════════════════════
+//  RENDER — CHECKLIST
+// ════════════════════════════════════════════════
+
+function renderChecklist() {
+  const root = document.getElementById('checklist-root');
+  root.innerHTML = '';
+
+  SECTIONS.forEach(sec => {
+    const items = resolveItems(sec);
+    if (!items.length) return;
+    const {done,total} = secProgress(sec);
+    const pct = done/total;
+    const bc = pct===1 ? 'done' : pct>0 ? 'partial' : '';
+    const isOpen = openSecs.has(sec.id);
+
+    const el = document.createElement('div');
+    el.className = 'section' + (isOpen?' open':'');
+    el.id = 'sec-'+sec.id;
+    el.innerHTML = `
+      <button class="sec-hdr" onclick="toggleSec('${sec.id}')">
+        <span class="sec-icon">${sec.icon}</span>
+        <span class="sec-name">${sec.name}</span>
+        <span class="sec-badge ${bc}" id="bd-${sec.id}">${done}/${total}</span>
+        <span class="chevron">›</span>
+      </button>
+      <div class="sec-body">
+        ${items.map(it => itemHTML(it,'cl-')).join('')}
+      </div>`;
+    root.appendChild(el);
+  });
+}
+
+function itemHTML(it, prefix) {
+  let lbl = it.lbl;
+  if (it.dynamic === 'rotopax') {
+    const m = S.cfg.rotopax === 'water' ? '💧 Water' : '⛽ Gas';
+    lbl = `Rotopax (${m}) — mounted and filled`;
+  }
+  const chk = S.checked[it.id] ? 'checked' : '';
+  return `
+    <label class="item" for="${prefix}${it.id}">
+      <input type="checkbox" id="${prefix}${it.id}" ${chk}
+             onchange="checkItem('${it.id}',this.checked,'${prefix}')">
+      <span class="chk"></span>
+      <span class="item-lbl">${lbl}${it.note?`<span class="item-note">${it.note}</span>`:''}</span>
+    </label>`;
+}
+
+function checkItem(id, val, fromPrefix) {
+  S.checked[id] = val;
+  save();
+  // sync twin checkbox
+  const other = fromPrefix==='cl-' ? 'pp-'+id : 'cl-'+id;
+  const el = document.getElementById(other);
+  if (el) el.checked = val;
+  // update badges
+  SECTIONS.forEach(sec => {
+    if (resolveItems(sec).find(i=>i.id===id)) {
+      refreshSecBadge(sec);
+    }
+  });
+  refreshHeader();
+  refreshBedBadges();
+}
+
+function refreshSecBadge(sec) {
+  const {done,total} = secProgress(sec);
+  const pct = done/total;
+  const bc = pct===1 ? 'done' : pct>0 ? 'partial' : '';
+  const el = document.getElementById('bd-'+sec.id);
+  if (el) { el.textContent=`${done}/${total}`; el.className='sec-badge '+bc; }
+}
+
+function refreshHeader() {
+  const {done,total} = totalProgress();
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('hdr-pct').textContent = pct+'%';
+}
+
+function refreshBedBadges() {
+  ['power','solar','fridge','kitchen','fire','propane','power-connect'].forEach(zid => {
+    const sec = SECTIONS.find(s=>s.zone===zid||s.id===zid);
+    if (!sec) return;
+    const {done,total} = secProgress(sec);
+    const el = document.getElementById('svb-'+zid);
+    if (el) el.textContent = `${done}/${total}`;
+  });
+}
+
+// ════════════════════════════════════════════════
+//  RENDER — BED MAP POPUP
+// ════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.bed-zone').forEach(el => {
+    el.addEventListener('click', function() { onZoneClick(this.dataset.zone); });
+  });
+});
+
+function onZoneClick(zid) {
+  if (activeZone === zid) { closeZonePopup(); return; }
+  if (activeZone) {
+    const prev = document.getElementById('sv-'+activeZone);
+    if (prev) prev.style.filter='';
+  }
+  activeZone = zid;
+  const el = document.getElementById('sv-'+zid);
+  if (el) el.style.filter='brightness(1.5)';
+
+  const sec = SECTIONS.find(s=>s.zone===zid||s.id===zid);
+  if (!sec) return;
+  const items = resolveItems(sec);
+  document.getElementById('popup-title').textContent = sec.icon+' '+sec.name;
+  document.getElementById('popup-items').innerHTML = items.map(it=>itemHTML(it,'pp-')).join('');
+  const popup = document.getElementById('zone-popup');
+  popup.style.display='';
+  setTimeout(()=>popup.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+function closeZonePopup() {
+  if (activeZone) {
+    const el = document.getElementById('sv-'+activeZone);
+    if (el) el.style.filter='';
+    activeZone = null;
+  }
+  document.getElementById('zone-popup').style.display='none';
+}
+
+// ════════════════════════════════════════════════
+//  RENDER — POWER
+// ════════════════════════════════════════════════
+
+const FRIDGE_WH  = 1080;  // 45W × 24h
+const PHONE_WH   = 40;    // per person/day
+const DECK_WH    = 75;
+const SOLAR_WH   = 1700;  // 400W × 5h × 85%
+const JACKERY_WH = 2042;
+const AC_W       = {sleep:150, medium:300, full:500};
+const AC_HOURS   = 8;
+
+function renderPower() {
+  const g = S.cfg;
+  const phonesWh = g.guests * PHONE_WH;
+  const acWh = g.acLoaded ? AC_W[g.acMode] * AC_HOURS : 0;
+  const draw = FRIDGE_WH + phonesWh + DECK_WH + acWh;
+  const net  = SOLAR_WH - draw;
+  const reserve = JACKERY_WH / draw; // in days
+
+  document.getElementById('pw-phones-lbl').textContent = `iPhones (${g.guests}×)`;
+  document.getElementById('pw-phones-val').textContent  = `${phonesWh} Wh`;
+  document.getElementById('pw-ac-row').style.display    = g.acLoaded ? '' : 'none';
+  if (g.acLoaded) {
+    document.getElementById('pw-ac-lbl').textContent = `Zero Breeze ${g.acMode} (${AC_HOURS}h)`;
+    document.getElementById('pw-ac-val').textContent = `${acWh.toLocaleString()} Wh`;
+  }
+  document.getElementById('pw-total').textContent    = `${draw.toLocaleString()} Wh`;
+  document.getElementById('pw-draw-lbl').textContent = `−${draw.toLocaleString()} Wh/day`;
+
+  const netEl = document.getElementById('pw-net');
+  netEl.textContent  = (net>=0?'+':'')+net.toLocaleString()+' Wh/day';
+  netEl.className    = 'calc-val '+(net>=0?'pos':net>-500?'warn':'neg');
+
+  const resEl = document.getElementById('pw-reserve');
+  const rStr  = reserve>=1 ? reserve.toFixed(1)+' days' : (reserve*24).toFixed(1)+' hrs';
+  resEl.textContent = rStr;
+  resEl.className   = 'calc-val '+(reserve>=1?'pos':reserve>=0.5?'warn':'neg');
+
+  // AC mode buttons
+  ['sleep','medium','full'].forEach(m => {
+    const b = document.getElementById('acm-'+m);
+    if (b) b.className = m===g.acMode?'on':'';
+  });
+  document.getElementById('sw-ac').className = 'sw'+(g.acLoaded?' on':'');
+  document.getElementById('ac-mode-wrap').style.display = g.acLoaded ? '' : 'none';
+}
+
+// ════════════════════════════════════════════════
+//  RENDER — WATER
+// ════════════════════════════════════════════════
+
+const HYDROPOD = 4.8;
+const ROTOPAX  = 2.0;
+const TOTAL_W  = HYDROPOD + ROTOPAX; // 6.8
+const DRINK_PP = 1.0;
+const COOK_PP  = 0.5;
+const SHOWER_PP= 0.75;
+
+function renderWater() {
+  const g = S.cfg;
+  const drink  = g.guests * DRINK_PP;
+  const cook   = g.guests * COOK_PP;
+  const shower = g.showShower ? g.guests * SHOWER_PP : 0;
+  const perDay = drink + cook + shower;
+  const days   = TOTAL_W / perDay;
+  const tripNeed = perDay * g.tripDays;
+  const surplus  = TOTAL_W - tripNeed;
+
+  document.getElementById('wt-drink-lbl').textContent  = `Drinking (${g.guests}p × 1.0 gal)`;
+  document.getElementById('wt-drink-val').textContent  = drink.toFixed(1)+' gal';
+  document.getElementById('wt-cook-lbl').textContent   = `Cooking & cleaning (${g.guests}p × 0.5)`;
+  document.getElementById('wt-cook-val').textContent   = cook.toFixed(1)+' gal';
+  document.getElementById('wt-shower-row').style.display = g.showShower ? '' : 'none';
+  if (g.showShower)
+    document.getElementById('wt-shower-lbl').textContent = `Shower (${g.guests}p × 0.75 gal)`;
+  document.getElementById('wt-total-day').textContent  = perDay.toFixed(2)+' gal/day';
+
+  const daysEl = document.getElementById('wt-days-num');
+  daysEl.textContent = days.toFixed(1);
+  daysEl.style.color = days>=3?'var(--green)':days>=1.5?'var(--amber)':'var(--red)';
+
+  document.getElementById('wt-trip-lbl').textContent   = `Trip (${g.tripDays}d × ${perDay.toFixed(2)} gal)`;
+  document.getElementById('wt-trip-need').textContent  = tripNeed.toFixed(2)+' gal needed';
+
+  const surEl = document.getElementById('wt-surplus');
+  surEl.textContent = (surplus>=0?'+':'')+surplus.toFixed(2)+' gal';
+  surEl.className   = 'calc-val '+(surplus>=0?'pos':surplus>=-1?'warn':'neg');
+
+  document.getElementById('sw-shower').className = 'sw'+(g.showShower?' on':'');
+}
+
+// ════════════════════════════════════════════════
+//  RENDER — SETTINGS WIDGETS
+// ════════════════════════════════════════════════
+
+function renderSettings() {
+  const g = S.cfg;
+  document.getElementById('s-guests').textContent = g.guests;
+  document.getElementById('s-days').textContent   = g.tripDays;
+  document.getElementById('rot-water').className  = g.rotopax==='water'?'on':'';
+  document.getElementById('rot-gas').className    = g.rotopax==='gas'?'on':'';
+  document.getElementById('sw-perm').className    = 'sw'+(g.permissive?' on':'');
+}
+
+function updateSubheader() {
+  const g = S.cfg;
+  const loc = g.permissive?' · permissive':'';
+  document.getElementById('hdr-sub').textContent =
+    `${g.guests} ${g.guests===1?'person':'people'} · ${g.tripDays} day${g.tripDays!==1?'s':''}${loc}`;
+}
+
+// ════════════════════════════════════════════════
+//  INTERACTIONS
+// ════════════════════════════════════════════════
+
+function toggleSec(id) {
+  const el = document.getElementById('sec-'+id);
+  if (openSecs.has(id)) { openSecs.delete(id); el.classList.remove('open'); }
+  else                  { openSecs.add(id);    el.classList.add('open');    }
+  save();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn') .forEach(el=>el.classList.remove('on'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('on');
+}
+
+function adj(key, delta) {
+  const mins = {guests:1, tripDays:1};
+  const maxs = {guests:8, tripDays:14};
+  S.cfg[key] = Math.max(mins[key], Math.min(maxs[key], S.cfg[key]+delta));
+  document.getElementById('s-'+{guests:'guests',tripDays:'days'}[key]).textContent = S.cfg[key];
+  save(); renderAll();
+}
+
+function setRotopax(mode) {
+  S.cfg.rotopax = mode;
+  document.getElementById('rot-water').className = mode==='water'?'on':'';
+  document.getElementById('rot-gas').className   = mode==='gas'  ?'on':'';
+  save(); renderChecklist();
+}
+
+function toggle(key) {
+  S.cfg[key] = !S.cfg[key];
+  save(); renderAll();
+}
+
+function setACMode(mode) {
+  S.cfg.acMode = mode;
+  save(); renderPower();
+}
+
+function openModal()  { document.getElementById('modal').classList.add('open'); renderSettings(); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function modalBgClick(e) { if (e.target===document.getElementById('modal')) closeModal(); }
+
+function doReset() {
+  if (!confirm('Reset all checks for a new trip?\n\nSettings will be kept.')) return;
+  S.checked = {};
+  save(); renderAll();
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+
+function renderAll() {
+  renderChecklist();
+  renderPower();
+  renderWater();
+  renderSettings();
+  refreshHeader();
+  refreshBedBadges();
+  updateSubheader();
+}
+
+load();
+renderAll();
+</script>
+</body>
+</html>
