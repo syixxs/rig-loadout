@@ -628,6 +628,14 @@ const SECTIONS = [
       {id:'pc2', lbl:'SolarSaga charging cables',  note:'Staged and accessible for camp setup'},
     ]
   },
+  { id:'climate', icon:'❄️', name:'Climate Control', zone:'climate',
+    items:[
+      {id:'ac1', lbl:'Zero Breeze Mark 3 unit loaded',    note:'Passenger side mid bed — stowed for transit', dynamic:'ac'},
+      {id:'ac2', lbl:'Zero Breeze battery loaded',        note:'Charged — check indicator before departure', dynamic:'ac'},
+      {id:'ac3', lbl:'Routed through Condor 2 HVAC ports',note:'Hose connected and seated at camp setup', dynamic:'ac'},
+      {id:'ac4', lbl:'Zero Breeze power cable staged',    note:'Accessible for connection at camp', dynamic:'ac'},
+    ]
+  },
   { id:'kitchen', icon:'🍳', name:'Kitchen & Camp', zone:'kitchen',
     items:[
       {id:'kt1', lbl:'RTIC 45L pantry',            note:'Loaded and stocked — passenger mid'},
@@ -715,6 +723,7 @@ function resolveItems(sec) {
   }
   return sec.items.filter(it => {
     if (it.dynamic === 'perm') return S.cfg.permissive;
+    if (it.dynamic === 'ac')   return S.cfg.acLoaded;
     return true;
   });
 }
