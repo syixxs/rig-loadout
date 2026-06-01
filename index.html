@@ -252,116 +252,140 @@
                 font-family="-apple-system,sans-serif" font-weight="600">← CAB WALL — MOPAR RAIL →</text>
 
           <!-- Anchor points (4 on cab rail) -->
-          <circle cx="60"  cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <circle cx="115" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <circle cx="185" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <circle cx="240" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="56"  cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="108" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="196" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
+          <circle cx="248" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
 
           <!-- ── POWER ZONE (driver/left, cab-forward) ── -->
+          <!-- Jackery 2000 v2: ~16"W x 15"D -> ~86px x 90px at scale -->
           <rect id="sv-power" class="bed-zone" data-zone="power"
-                x="4" y="46" width="118" height="150"
+                x="4" y="42" width="104" height="150"
                 fill="#2a4d6a" rx="5"/>
-          <text x="63" y="114" text-anchor="middle" fill="#9ecfee"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">⚡ POWER</text>
-          <text x="63" y="130" text-anchor="middle" fill="#9ecfee"
+          <text x="56" y="110" text-anchor="middle" fill="#9ecfee"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x26A1; POWER</text>
+          <text x="56" y="126" text-anchor="middle" fill="#9ecfee"
                 font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Jackery 2000 v2</text>
-          <text id="svb-power" x="63" y="146" text-anchor="middle" fill="#9ecfee"
+          <text id="svb-power" x="56" y="142" text-anchor="middle" fill="#9ecfee"
                 font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
 
           <!-- ── SOLAR ZONE (center, cab-forward) ── -->
+          <!-- 2x SolarSaga 200W stacked + Renogy 300W briefcase stacked -->
           <rect id="sv-solar" class="bed-zone" data-zone="solar"
-                x="122" y="46" width="82" height="130"
+                x="112" y="42" width="84" height="150"
                 fill="#5a4a1a" rx="5"/>
-          <text x="163" y="108" text-anchor="middle" fill="#ffe07a"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">☀ SOLAR</text>
-          <text x="163" y="123" text-anchor="middle" fill="#ffe07a"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">200W × 2</text>
-          <text id="svb-solar" x="163" y="138" text-anchor="middle" fill="#ffe07a"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
+          <text x="154" y="108" text-anchor="middle" fill="#ffe07a"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x2600; SOLAR</text>
+          <text x="154" y="123" text-anchor="middle" fill="#ffe07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">SolarSaga x2</text>
+          <text x="154" y="136" text-anchor="middle" fill="#ffe07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">+ Renogy 300W</text>
+          <text id="svb-solar" x="154" y="150" text-anchor="middle" fill="#ffe07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/5</text>
 
           <!-- ── FRIDGE ZONE (passenger/right, cab-forward) ── -->
+          <!-- CFX5 45: 15.7"W x 27.3"L -> ~85px x 166px at scale. Lid toward tailgate. -->
           <rect id="sv-fridge" class="bed-zone" data-zone="fridge"
-                x="204" y="46" width="92" height="170"
+                x="200" y="42" width="96" height="164"
                 fill="#1c5a3a" rx="5"/>
-          <text x="250" y="124" text-anchor="middle" fill="#80f0b0"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🧊 FRIDGE</text>
-          <text x="250" y="140" text-anchor="middle" fill="#80f0b0"
+          <text x="248" y="118" text-anchor="middle" fill="#80f0b0"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F9CA; FRIDGE</text>
+          <text x="248" y="134" text-anchor="middle" fill="#80f0b0"
                 font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">CFX5 45</text>
-          <text id="svb-fridge" x="250" y="155" text-anchor="middle" fill="#80f0b0"
+          <text x="248" y="147" text-anchor="middle" fill="#80f0b0"
+                font-size="9" font-family="-apple-system,sans-serif" pointer-events="none">lid -> tailgate</text>
+          <text id="svb-fridge" x="248" y="160" text-anchor="middle" fill="#80f0b0"
                 font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
 
           <!-- ── POWER CONNECT (driver, below power zone) ── -->
           <rect id="sv-power-connect" class="bed-zone" data-zone="power-connect"
-                x="4" y="196" width="118" height="62"
+                x="4" y="196" width="104" height="54"
                 fill="#1e3a58" rx="5"/>
-          <text x="63" y="224" text-anchor="middle" fill="#7ab4d8"
-                font-size="11" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🔌 CONNECTIONS</text>
-          <text id="svb-power-connect" x="63" y="240" text-anchor="middle" fill="#7ab4d8"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/2</text>
+          <text x="56" y="220" text-anchor="middle" fill="#7ab4d8"
+                font-size="11" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F50C; CABLES</text>
+          <text id="svb-power-connect" x="56" y="238" text-anchor="middle" fill="#7ab4d8"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
 
-          <!-- ── KITCHEN ZONE (passenger + center, mid) ── -->
+          <!-- ── KITCHEN ZONE (center, mid) ── -->
+          <!-- RTIC 45L pantry + Pecos table (38"x20") — center band -->
           <rect id="sv-kitchen" class="bed-zone" data-zone="kitchen"
-                x="122" y="176" width="174" height="130"
+                x="112" y="196" width="84" height="114"
                 fill="#5a3c1a" rx="5"/>
-          <text x="209" y="234" text-anchor="middle" fill="#f5c07a"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🍳 KITCHEN</text>
-          <text x="209" y="250" text-anchor="middle" fill="#f5c07a"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">RTIC + Pecos Table</text>
-          <text id="svb-kitchen" x="209" y="266" text-anchor="middle" fill="#f5c07a"
+          <text x="154" y="246" text-anchor="middle" fill="#f5c07a"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F373; KITCHEN</text>
+          <text x="154" y="261" text-anchor="middle" fill="#f5c07a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">RTIC + Table</text>
+          <text id="svb-kitchen" x="154" y="276" text-anchor="middle" fill="#f5c07a"
                 font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/5</text>
 
-          <!-- ── SANITATION ZONE (driver mid) ── -->
-          <rect id="sv-sanitation" class="bed-zone" data-zone="sanitation"
-                x="4" y="258" width="118" height="70"
-                fill="#3a2c4a" rx="5"/>
-          <text x="63" y="278" text-anchor="middle" fill="#c8a0f0"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🚽 SANITATION</text>
-          <text x="63" y="293" text-anchor="middle" fill="#c8a0f0"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">GO Anywhere WC</text>
-          <text id="svb-sanitation" x="63" y="308" text-anchor="middle" fill="#c8a0f0"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-
-          <!-- ── Wheel wells ── -->
-          <ellipse cx="44"  cy="362" rx="42" ry="26" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
-          <ellipse cx="260" cy="362" rx="42" ry="26" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
-
-          <!-- ── FIRE ZONE (center-pass, mid-rear) ── -->
-          <rect id="sv-fire" class="bed-zone" data-zone="fire"
-                x="122" y="306" width="174" height="90"
-                fill="#6a2e0c" rx="5"/>
-          <text x="209" y="348" text-anchor="middle" fill="#f5956a"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🔥 FIRE &amp; COOK</text>
-          <text x="209" y="363" text-anchor="middle" fill="#f5956a"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Lavabox + Breeo</text>
-          <text id="svb-fire" x="209" y="378" text-anchor="middle" fill="#f5956a"
-                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-
-          <!-- ── PROPANE ZONE (driver rear, between wheel wells) ── -->
-          <rect id="sv-propane" class="bed-zone" data-zone="propane"
-                x="4" y="328" width="88" height="80"
-                fill="#3c3c40" rx="5"/>
-          <text x="48" y="365" text-anchor="middle" fill="#c0c0c8"
-                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">🛢 LPG</text>
-          <text id="svb-propane" x="48" y="381" text-anchor="middle" fill="#c0c0c8"
+          <!-- ── CLIMATE ZONE (passenger/right, mid) ── -->
+          <!-- Zero Breeze MK3 + battery: ~20"L x 16"W -->
+          <rect id="sv-climate" class="bed-zone" data-zone="climate"
+                x="200" y="210" width="96" height="100"
+                fill="#1a3a5a" rx="5"/>
+          <text x="248" y="252" text-anchor="middle" fill="#88ccff"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x2744; AC</text>
+          <text x="248" y="267" text-anchor="middle" fill="#88ccff"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Zero Breeze MK3</text>
+          <text id="svb-climate" x="248" y="282" text-anchor="middle" fill="#88ccff"
                 font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/4</text>
+
+          <!-- ── SANITATION ZONE (driver mid) ── -->
+          <!-- GO Anywhere toilet folded: 19"x15"x5" -->
+          <rect id="sv-sanitation" class="bed-zone" data-zone="sanitation"
+                x="4" y="254" width="104" height="60"
+                fill="#3a2c4a" rx="5"/>
+          <text x="56" y="278" text-anchor="middle" fill="#c8a0f0"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F6BD; SANITATION</text>
+          <text x="56" y="293" text-anchor="middle" fill="#c8a0f0"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">GO Anywhere WC</text>
+          <text id="svb-sanitation" x="56" y="306" text-anchor="middle" fill="#c8a0f0"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
+
+          <!-- ── Wheel wells (mid-rear, inset from sides) ── -->
+          <ellipse cx="44"  cy="368" rx="40" ry="22" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
+          <ellipse cx="258" cy="368" rx="40" ry="22" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
+
+          <!-- ── PROPANE ZONE (driver rear corner) ── -->
+          <!-- 20lb tank footprint: ~12" dia -> ~73px; stowed upright -->
+          <rect id="sv-propane" class="bed-zone" data-zone="propane"
+                x="4" y="318" width="88" height="86"
+                fill="#3c3c40" rx="5"/>
+          <text x="48" y="358" text-anchor="middle" fill="#c0c0c8"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F6E2; LPG</text>
+          <text x="48" y="374" text-anchor="middle" fill="#c0c0c8"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">20 lb tank</text>
+          <text id="svb-propane" x="48" y="388" text-anchor="middle" fill="#c0c0c8"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/4</text>
+
+          <!-- ── FIRE ZONE (center-pass, rear — between wheel wells) ── -->
+          <rect id="sv-fire" class="bed-zone" data-zone="fire"
+                x="112" y="314" width="184" height="90"
+                fill="#6a2e0c" rx="5"/>
+          <text x="204" y="354" text-anchor="middle" fill="#f5956a"
+                font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F525; FIRE &amp; COOK</text>
+          <text x="204" y="369" text-anchor="middle" fill="#f5956a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Lavabox + Breeo</text>
+          <text id="svb-fire" x="204" y="384" text-anchor="middle" fill="#f5956a"
+                font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
 
           <!-- Tailgate band -->
           <rect x="4" y="408" width="292" height="38" rx="5" fill="#2a2a2c"/>
           <text x="150" y="430" text-anchor="middle" fill="#555" font-size="10"
-                font-family="-apple-system,sans-serif">↓  TAILGATE  ↓</text>
+                font-family="-apple-system,sans-serif">&#x2193;  TAILGATE  &#x2193;</text>
           <text x="14" y="444" fill="#444" font-size="9" font-family="-apple-system,sans-serif">DRIVER</text>
           <text x="255" y="444" fill="#444" font-size="9" font-family="-apple-system,sans-serif">PASS.</text>
 
           <!-- Awning note -->
-          <text x="290" y="395" fill="#5a4a2a" font-size="9" text-anchor="end"
-                font-family="-apple-system,sans-serif">270° awning →</text>
+          <text x="290" y="400" fill="#5a4a2a" font-size="9" text-anchor="end"
+                font-family="-apple-system,sans-serif">270&#xB0; awning &#x2192;</text>
         </svg>
 
         <!-- Zone popup -->
         <div id="zone-popup" class="zone-popup" style="display:none">
           <div class="popup-hdr">
             <span id="popup-title">Zone</span>
-            <button class="popup-close" onclick="closeZonePopup()">✕</button>
+            <button class="popup-close" onclick="closeZonePopup()">&#x2715;</button>
           </div>
           <div id="popup-items"></div>
         </div>
@@ -389,7 +413,7 @@
           <div class="calc-val">1,080 Wh</div>
         </div>
         <div class="calc-row">
-          <div class="calc-lbl" id="pw-phones-lbl">iPhones (1×)</div>
+          <div class="calc-lbl" id="pw-phones-lbl">iPhones (1x)</div>
           <div class="calc-val" id="pw-phones-val">40 Wh</div>
         </div>
         <div class="calc-row">
@@ -398,11 +422,11 @@
         </div>
         <div id="pw-ac-row" class="calc-row" style="display:none">
           <div class="calc-lbl" id="pw-ac-lbl">Zero Breeze (8h)</div>
-          <div class="calc-val" id="pw-ac-val">—</div>
+          <div class="calc-val" id="pw-ac-val">&#x2014;</div>
         </div>
         <div class="calc-row total-row">
           <div class="calc-lbl">Total daily draw</div>
-          <div class="calc-val" id="pw-total">—</div>
+          <div class="calc-val" id="pw-total">&#x2014;</div>
         </div>
       </div>
 
@@ -414,15 +438,15 @@
         </div>
         <div class="calc-row">
           <div class="calc-lbl">Daily draw</div>
-          <div class="calc-val" id="pw-draw-lbl">—</div>
+          <div class="calc-val" id="pw-draw-lbl">&#x2014;</div>
         </div>
         <div class="calc-row total-row">
           <div class="calc-lbl">Net solar balance</div>
-          <div class="calc-val" id="pw-net">—</div>
+          <div class="calc-val" id="pw-net">&#x2014;</div>
         </div>
         <div class="calc-row">
           <div class="calc-lbl">Battery-only reserve (no sun)</div>
-          <div class="calc-val" id="pw-reserve">—</div>
+          <div class="calc-val" id="pw-reserve">&#x2014;</div>
         </div>
       </div>
 
@@ -443,8 +467,9 @@
       </div>
 
       <div class="info-card">
-        ☀️ <strong>Solar covers most loads</strong> on a typical desert day without the AC. With AC in sleep mode nightly, you'll draw ~200–400 Wh net from the Jackery per night.<br><br>
-        🔋 The Zero Breeze Mark 3 Plus includes a <strong>built-in 1,022 Wh battery</strong> — it runs on that first before pulling from the Jackery, extending your reserve significantly.
+        &#x2600;&#xFE0F; <strong>Solar covers most loads</strong> on a typical desert day without the AC. With AC in sleep mode nightly, you'll draw ~200-400 Wh net from the Jackery per night.<br><br>
+        &#x1F50B; The Zero Breeze Mark 3 Plus includes a <strong>built-in 1,022 Wh battery</strong> — it runs on that first before pulling from the Jackery, extending your reserve significantly.<br><br>
+        &#x1F31E; The <strong>Renogy 300W briefcase</strong> charges the ZB battery directly via MC4 — a fully independent solar loop for the AC unit.
       </div>
     </div>
 
@@ -457,7 +482,7 @@
           <div class="stat-lbl">gal total on board</div>
         </div>
         <div class="stat-box">
-          <div class="stat-num" id="wt-days-num" style="color:var(--blue)">—</div>
+          <div class="stat-num" id="wt-days-num" style="color:var(--blue)">&#x2014;</div>
           <div class="stat-lbl">days of water</div>
         </div>
       </div>
@@ -481,11 +506,11 @@
       <div class="calc-card">
         <div class="calc-hdr">Daily Consumption</div>
         <div class="calc-row">
-          <div class="calc-lbl" id="wt-drink-lbl">Drinking (1p × 1.0 gal)</div>
+          <div class="calc-lbl" id="wt-drink-lbl">Drinking (1p x 1.0 gal)</div>
           <div class="calc-val" id="wt-drink-val">1.0 gal</div>
         </div>
         <div class="calc-row">
-          <div class="calc-lbl" id="wt-cook-lbl">Cooking &amp; cleaning (1p × 0.5)</div>
+          <div class="calc-lbl" id="wt-cook-lbl">Cooking &amp; cleaning (1p x 0.5)</div>
           <div class="calc-val" id="wt-cook-val">0.5 gal</div>
         </div>
         <div class="setting-row" style="border-bottom:1px solid var(--border)">
@@ -493,12 +518,12 @@
           <button id="sw-shower" class="sw" onclick="toggle('showShower')"></button>
         </div>
         <div id="wt-shower-row" class="calc-row" style="display:none">
-          <div class="calc-lbl" id="wt-shower-lbl">Shower (1p × 0.75 gal)</div>
+          <div class="calc-lbl" id="wt-shower-lbl">Shower (1p x 0.75 gal)</div>
           <div class="calc-val">0.75 gal</div>
         </div>
         <div class="calc-row total-row">
           <div class="calc-lbl">Total per day</div>
-          <div class="calc-val" id="wt-total-day">—</div>
+          <div class="calc-val" id="wt-total-day">&#x2014;</div>
         </div>
       </div>
 
@@ -506,17 +531,17 @@
         <div class="calc-hdr">Trip vs. Supply</div>
         <div class="calc-row">
           <div class="calc-lbl" id="wt-trip-lbl">Trip duration</div>
-          <div class="calc-val" id="wt-trip-need">—</div>
+          <div class="calc-val" id="wt-trip-need">&#x2014;</div>
         </div>
         <div class="calc-row total-row">
           <div class="calc-lbl">Water surplus / deficit</div>
-          <div class="calc-val" id="wt-surplus">—</div>
+          <div class="calc-val" id="wt-surplus">&#x2014;</div>
         </div>
       </div>
 
       <div class="info-card">
-        💧 <strong>Grayl GeoPress</strong> supplements from streams or questionable sources — plan to use it for daytime trail drinking to preserve your tank.<br><br>
-        🚿 The HydroPod hand pump pressurizes in ~30 strokes. A quick rinse uses ≈0.5 gal; a full wash ≈0.75 gal. Count carefully on multi-day trips.
+        &#x1F4A7; <strong>Grayl GeoPress</strong> supplements from streams or questionable sources — plan to use it for daytime trail drinking to preserve your tank.<br><br>
+        &#x1F6BF; The HydroPod hand pump pressurizes in ~30 strokes. A quick rinse uses ~0.5 gal; a full wash ~0.75 gal. Count carefully on multi-day trips.
       </div>
     </div>
 
@@ -525,16 +550,16 @@
   <!-- ═══ TAB BAR ═══ -->
   <nav>
     <button class="tab-btn on" data-tab="checklist" onclick="switchTab('checklist')">
-      <span class="tab-icon">☑️</span><span>Checklist</span>
+      <span class="tab-icon">&#x2611;&#xFE0F;</span><span>Checklist</span>
     </button>
     <button class="tab-btn" data-tab="bedmap" onclick="switchTab('bedmap')">
-      <span class="tab-icon">🗺️</span><span>Bed Map</span>
+      <span class="tab-icon">&#x1F5FA;&#xFE0F;</span><span>Bed Map</span>
     </button>
     <button class="tab-btn" data-tab="power" onclick="switchTab('power')">
-      <span class="tab-icon">⚡</span><span>Power</span>
+      <span class="tab-icon">&#x26A1;</span><span>Power</span>
     </button>
     <button class="tab-btn" data-tab="water" onclick="switchTab('water')">
-      <span class="tab-icon">💧</span><span>Water</span>
+      <span class="tab-icon">&#x1F4A7;</span><span>Water</span>
     </button>
   </nav>
 
@@ -545,13 +570,13 @@
   <div class="modal-box">
     <div class="modal-hdr">
       <span class="title">Trip Settings</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
     </div>
     <div class="settings-card" style="margin:0;border-radius:0">
       <div class="setting-row">
         <div class="setting-lbl">People on trip</div>
         <div class="stepper">
-          <button onclick="adj('guests',-1)">−</button>
+          <button onclick="adj('guests',-1)">&#x2212;</button>
           <span class="stepper-val" id="s-guests">1</span>
           <button onclick="adj('guests',1)">+</button>
         </div>
@@ -559,7 +584,7 @@
       <div class="setting-row">
         <div class="setting-lbl">Trip duration (days)</div>
         <div class="stepper">
-          <button onclick="adj('tripDays',-1)">−</button>
+          <button onclick="adj('tripDays',-1)">&#x2212;</button>
           <span class="stepper-val" id="s-days">2</span>
           <button onclick="adj('tripDays',1)">+</button>
         </div>
@@ -567,8 +592,8 @@
       <div class="setting-row">
         <div class="setting-lbl">Rotopax</div>
         <div class="toggle-grp">
-          <button id="rot-water" onclick="setRotopax('water')">💧 Water</button>
-          <button id="rot-gas"   onclick="setRotopax('gas')">⛽ Gas</button>
+          <button id="rot-water" onclick="setRotopax('water')">&#x1F4A7; Water</button>
+          <button id="rot-gas"   onclick="setRotopax('gas')">&#x26FD; Gas</button>
         </div>
       </div>
       <div class="setting-row" style="border-bottom:none">
@@ -587,7 +612,7 @@
 // ════════════════════════════════════════════════
 
 const SECTIONS = [
-  { id:'rack', icon:'🔧', name:'Rack Check',
+  { id:'rack', icon:'&#x1F527;', name:'Rack Check',
     items:[
       {id:'r1', lbl:'Condor Overland tent',      note:'Stowed — all zippers closed'},
       {id:'r2', lbl:'Litewing 270 awning',        note:'Stowed and secured to rack'},
@@ -600,35 +625,38 @@ const SECTIONS = [
       {id:'r9', lbl:'Helinox Tactical chair',     note:'Stowed in GearPod'},
     ]
   },
-  { id:'tent', icon:'⛺', name:'Tent Interior', dynamic:'tent', items:[] },
-  { id:'power', icon:'⚡', name:'Power Zone', zone:'power',
+  { id:'tent', icon:'&#x26FA;', name:'Tent Interior', dynamic:'tent', items:[] },
+  { id:'power', icon:'&#x26A1;&#xFE0F;', name:'Power Zone', zone:'power',
     items:[
       {id:'pw1', lbl:'Jackery Explorer 2000 v2',  note:'Loaded — driver side, cab-forward'},
       {id:'pw2', lbl:'Jackery strapped down',     note:'Secured to MOPAR cab wall anchor'},
       {id:'pw3', lbl:'Jackery charge verified',   note:'Check display — top off if below 80%'},
     ]
   },
-  { id:'solar', icon:'☀️', name:'Solar Panels', zone:'solar',
+  { id:'solar', icon:'&#x2600;&#xFE0F;', name:'Solar Panels', zone:'solar',
     items:[
       {id:'sol1', lbl:'SolarSaga 200W — Panel 1', note:'Flat in bed, center cab-side'},
       {id:'sol2', lbl:'SolarSaga 200W — Panel 2', note:'Flat, stacked on Panel 1'},
-      {id:'sol3', lbl:'Panels protected',         note:'Sandwiched between Jackery and fridge'},
+      {id:'sol3', lbl:'Renogy 300W briefcase',    note:'Stacked in solar zone — for Zero Breeze battery charging'},
+      {id:'sol4', lbl:'Renogy MC4 cable staged',  note:'ZB solar charging cable — accessible at camp for ZB battery'},
+      {id:'sol5', lbl:'Panels protected',          note:'Stack secured between Jackery and fridge'},
     ]
   },
-  { id:'fridge', icon:'🧊', name:'Fridge Zone', zone:'fridge',
+  { id:'fridge', icon:'&#x1F9CA;', name:'Fridge Zone', zone:'fridge',
     items:[
       {id:'fr1', lbl:'Dometic CFX5 45',            note:'Loaded — passenger side, cab-forward'},
       {id:'fr2', lbl:'Fridge strapped down',       note:'Secured to MOPAR cab wall anchor'},
       {id:'fr3', lbl:'Fridge powered on',          note:'Display active — temp set and verified'},
     ]
   },
-  { id:'power-connect', icon:'🔌', name:'Power Connections', zone:'power-connect',
+  { id:'power-connect', icon:'&#x1F50C;', name:'Power Connections', zone:'power-connect',
     items:[
-      {id:'pc1', lbl:'Jackery → Fridge DC cable',  note:'Connected and routed cleanly'},
-      {id:'pc2', lbl:'SolarSaga charging cables',  note:'Staged and accessible for camp setup'},
+      {id:'pc1', lbl:'Jackery to Fridge DC cable',    note:'Connected and routed cleanly'},
+      {id:'pc2', lbl:'SolarSaga charging cables',    note:'Staged and accessible for camp setup'},
+      {id:'pc3', lbl:'Renogy to Zero Breeze cable',  note:'MC4 adapter — staged for ZB battery solar charging'},
     ]
   },
-  { id:'climate', icon:'❄️', name:'Climate Control', zone:'climate',
+  { id:'climate', icon:'&#x2744;&#xFE0F;', name:'Climate Control', zone:'climate',
     items:[
       {id:'ac1', lbl:'Zero Breeze Mark 3 unit loaded',    note:'Passenger side mid bed — stowed for transit', dynamic:'ac'},
       {id:'ac2', lbl:'Zero Breeze battery loaded',        note:'Charged — check indicator before departure', dynamic:'ac'},
@@ -636,7 +664,7 @@ const SECTIONS = [
       {id:'ac4', lbl:'Zero Breeze power cable staged',    note:'Accessible for connection at camp', dynamic:'ac'},
     ]
   },
-  { id:'kitchen', icon:'🍳', name:'Kitchen & Camp', zone:'kitchen',
+  { id:'kitchen', icon:'&#x1F373;', name:'Kitchen & Camp', zone:'kitchen',
     items:[
       {id:'kt1', lbl:'RTIC 45L pantry',            note:'Loaded and stocked — passenger mid'},
       {id:'kt2', lbl:'AeroPress',                  note:'In RTIC'},
@@ -645,14 +673,14 @@ const SECTIONS = [
       {id:'kt5', lbl:'Pecos table',                note:'Loaded flat — legs stored inside surface'},
     ]
   },
-  { id:'fire', icon:'🔥', name:'Fire & Cooking', zone:'fire',
+  { id:'fire', icon:'&#x1F525;', name:'Fire & Cooking', zone:'fire',
     items:[
       {id:'fi1', lbl:'Lavabox campfire',            note:'In carry bag — loaded'},
       {id:'fi2', lbl:'Breeo Outpost 19"',           note:'In carry bag — loaded'},
       {id:'fi3', lbl:'Wood / charcoal',             note:'Loaded in Overland Gear Guy bag at tailgate'},
     ]
   },
-  { id:'propane', icon:'🛢️', name:'Propane Zone', zone:'propane',
+  { id:'propane', icon:'&#x1F6E2;&#xFE0F;', name:'Propane Zone', zone:'propane',
     items:[
       {id:'pr1', lbl:'20 lb propane tank',         note:'Upright — driver rear corner'},
       {id:'pr2', lbl:'Non-slip mat',               note:'Under foot ring'},
@@ -660,14 +688,14 @@ const SECTIONS = [
       {id:'pr4', lbl:'Strap #2',                   note:'Around tank body to opposite cleat'},
     ]
   },
-  { id:'sanitation', icon:'🚽', name:'Sanitation', zone:'sanitation',
+  { id:'sanitation', icon:'&#x1F6BD;', name:'Sanitation', zone:'sanitation',
     items:[
-      {id:'san1', lbl:'GO Anywhere Portable Toilet', note:'Driver mid bed — folded flat, 19×15×5"'},
+      {id:'san1', lbl:'GO Anywhere Portable Toilet', note:'Driver mid bed — folded flat, 19x15x5"'},
       {id:'san2', lbl:'WAG BAGs loaded in toilet',   note:'50-pack stored inside folded unit'},
       {id:'san3', lbl:'Waste bag stash verified',    note:'Each kit has TP + hand wipe — no extras needed'},
     ]
   },
-  { id:'cab', icon:'🎒', name:'Cab & Personal',
+  { id:'cab', icon:'&#x1F392;', name:'Cab & Personal',
     items:[
       {id:'cb1', lbl:'Ruck',                        note:'Clothing + toiletries in back seat'},
       {id:'cb2', lbl:'Security kit',               note:'Bandolier + IFAK — loaded and accessible'},
@@ -764,7 +792,7 @@ function renderChecklist() {
         <span class="sec-icon">${sec.icon}</span>
         <span class="sec-name">${sec.name}</span>
         <span class="sec-badge ${bc}" id="bd-${sec.id}">${done}/${total}</span>
-        <span class="chevron">›</span>
+        <span class="chevron">&#x203A;</span>
       </button>
       <div class="sec-body">
         ${items.map(it => itemHTML(it,'cl-')).join('')}
@@ -776,7 +804,7 @@ function renderChecklist() {
 function itemHTML(it, prefix) {
   let lbl = it.lbl;
   if (it.dynamic === 'rotopax') {
-    const m = S.cfg.rotopax === 'water' ? '💧 Water' : '⛽ Gas';
+    const m = S.cfg.rotopax === 'water' ? '&#x1F4A7; Water' : '&#x26FD; Gas';
     lbl = `Rotopax (${m}) — mounted and filled`;
   }
   const chk = S.checked[it.id] ? 'checked' : '';
@@ -821,7 +849,7 @@ function refreshHeader() {
 }
 
 function refreshBedBadges() {
-  ['power','solar','fridge','kitchen','fire','propane','power-connect','sanitation'].forEach(zid => {
+  ['power','solar','fridge','kitchen','climate','fire','propane','power-connect','sanitation'].forEach(zid => {
     const sec = SECTIONS.find(s=>s.zone===zid||s.id===zid);
     if (!sec) return;
     const {done,total} = secProgress(sec);
@@ -873,10 +901,10 @@ function closeZonePopup() {
 //  RENDER — POWER
 // ════════════════════════════════════════════════
 
-const FRIDGE_WH  = 1080;  // 45W × 24h
+const FRIDGE_WH  = 1080;  // 45W x 24h
 const PHONE_WH   = 40;    // per person/day
 const DECK_WH    = 75;
-const SOLAR_WH   = 1700;  // 400W × 5h × 85%
+const SOLAR_WH   = 1700;  // 400W x 5h x 85%
 const JACKERY_WH = 2042;
 const AC_W       = {sleep:150, medium:300, full:500};
 const AC_HOURS   = 8;
@@ -889,7 +917,7 @@ function renderPower() {
   const net  = SOLAR_WH - draw;
   const reserve = JACKERY_WH / draw; // in days
 
-  document.getElementById('pw-phones-lbl').textContent = `iPhones (${g.guests}×)`;
+  document.getElementById('pw-phones-lbl').textContent = `iPhones (${g.guests}x)`;
   document.getElementById('pw-phones-val').textContent  = `${phonesWh} Wh`;
   document.getElementById('pw-ac-row').style.display    = g.acLoaded ? '' : 'none';
   if (g.acLoaded) {
@@ -897,7 +925,7 @@ function renderPower() {
     document.getElementById('pw-ac-val').textContent = `${acWh.toLocaleString()} Wh`;
   }
   document.getElementById('pw-total').textContent    = `${draw.toLocaleString()} Wh`;
-  document.getElementById('pw-draw-lbl').textContent = `−${draw.toLocaleString()} Wh/day`;
+  document.getElementById('pw-draw-lbl').textContent = `-${draw.toLocaleString()} Wh/day`;
 
   const netEl = document.getElementById('pw-net');
   netEl.textContent  = (net>=0?'+':'')+net.toLocaleString()+' Wh/day';
@@ -938,20 +966,20 @@ function renderWater() {
   const tripNeed = perDay * g.tripDays;
   const surplus  = TOTAL_W - tripNeed;
 
-  document.getElementById('wt-drink-lbl').textContent  = `Drinking (${g.guests}p × 1.0 gal)`;
+  document.getElementById('wt-drink-lbl').textContent  = `Drinking (${g.guests}p x 1.0 gal)`;
   document.getElementById('wt-drink-val').textContent  = drink.toFixed(1)+' gal';
-  document.getElementById('wt-cook-lbl').textContent   = `Cooking & cleaning (${g.guests}p × 0.5)`;
+  document.getElementById('wt-cook-lbl').textContent   = `Cooking & cleaning (${g.guests}p x 0.5)`;
   document.getElementById('wt-cook-val').textContent   = cook.toFixed(1)+' gal';
   document.getElementById('wt-shower-row').style.display = g.showShower ? '' : 'none';
   if (g.showShower)
-    document.getElementById('wt-shower-lbl').textContent = `Shower (${g.guests}p × 0.75 gal)`;
+    document.getElementById('wt-shower-lbl').textContent = `Shower (${g.guests}p x 0.75 gal)`;
   document.getElementById('wt-total-day').textContent  = perDay.toFixed(2)+' gal/day';
 
   const daysEl = document.getElementById('wt-days-num');
   daysEl.textContent = days.toFixed(1);
   daysEl.style.color = days>=3?'var(--green)':days>=1.5?'var(--amber)':'var(--red)';
 
-  document.getElementById('wt-trip-lbl').textContent   = `Trip (${g.tripDays}d × ${perDay.toFixed(2)} gal)`;
+  document.getElementById('wt-trip-lbl').textContent   = `Trip (${g.tripDays}d x ${perDay.toFixed(2)} gal)`;
   document.getElementById('wt-trip-need').textContent  = tripNeed.toFixed(2)+' gal needed';
 
   const surEl = document.getElementById('wt-surplus');
