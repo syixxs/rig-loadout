@@ -6,269 +6,443 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Rig Loadout">
-  <title>Rig Loadout &#x2014; Gladiator</title>
+  <meta name="theme-color" content="#1c1c1e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>Rig Loadout — Gladiator</title>
   <style>
     :root {
-      --bg: #1c1c1e; --surface: #2c2c2e; --surface2: #3a3a3c; --border: #48484a;
-      --accent: #c8a86b; --text: #f2f2f7; --text2: #aeaeb2; --green: #4a9c6d;
-      --amber: #e6962a; --red: #ff453a; --blue: #4da6ff; --tab-h: 72px; --hdr-h: 58px;
+      --bg: #1c1c1e;
+      --surface: #2c2c2e;
+      --surface2: #3a3a3c;
+      --border: #48484a;
+      --accent: #c8a86b;
+      --text: #f2f2f7;
+      --text2: #aeaeb2;
+      --green: #4a9c6d;
+      --amber: #e6962a;
+      --red: #ff453a;
+      --blue: #4da6ff;
+      --tab-h: 72px;
+      --hdr-h: 58px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
       font-size: 16px; overflow: hidden; }
     #app { display: flex; flex-direction: column; height: 100%; max-width: 430px; margin: 0 auto; }
-    header { background: var(--surface); border-bottom: 1px solid var(--border);
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
       height: var(--hdr-h); display: flex; align-items: center;
-      justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 10; }
+      justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 10;
+    }
     .hdr-left .title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
     .hdr-left .sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
     .hdr-pct { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1; }
     .hdr-pct-lbl { font-size: 11px; color: var(--text2); text-align: right; }
-    .settings-btn { background: none; border: none; color: var(--text2); font-size: 20px; padding: 10px; cursor: pointer; }
+    .settings-btn { background: none; border: none; color: var(--text2);
+      font-size: 20px; padding: 10px; cursor: pointer; }
+
+    /* ── MAIN SCROLL ── */
     main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
       padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); }
     .tab-pane { display: none; padding-top: 8px; }
     .tab-pane.active { display: block; }
+
+    /* ── PHASE SEGMENTED CONTROL ── */
+    .phase-seg {
+      display: flex; margin: 4px 14px 8px; background: var(--surface);
+      border-radius: 10px; padding: 3px; gap: 3px;
+    }
+    .phase-seg button {
+      flex: 1; padding: 9px 4px; border: none; background: none; border-radius: 8px;
+      color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .phase-seg button.on { background: var(--accent); color: #000; }
+    .phase-seg .ph-pct { display: block; font-size: 10px; font-weight: 400; margin-top: 1px; }
+    .phase-seg button.on .ph-pct { color: rgba(0,0,0,0.6); }
+
+    /* ── SECTION CARDS ── */
     .section { margin: 6px 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
-    .sec-hdr { width: 100%; background: none; border: none; color: var(--text);
+    .sec-hdr {
+      width: 100%; background: none; border: none; color: var(--text);
       display: flex; align-items: center; padding: 14px 14px; gap: 10px;
-      cursor: pointer; text-align: left; -webkit-appearance: none; }
+      cursor: pointer; text-align: left; -webkit-appearance: none;
+    }
     .sec-icon { font-size: 18px; flex-shrink: 0; }
     .sec-name { flex: 1; font-size: 15px; font-weight: 600; }
-    .sec-badge { font-size: 12px; background: var(--surface2); color: var(--text2);
-      padding: 3px 9px; border-radius: 10px; min-width: 46px; text-align: center; flex-shrink: 0; }
+    .sec-badge {
+      font-size: 12px; background: var(--surface2); color: var(--text2);
+      padding: 3px 9px; border-radius: 10px; min-width: 46px; text-align: center; flex-shrink: 0;
+    }
     .sec-badge.partial { background: var(--amber); color: #000; }
     .sec-badge.done { background: var(--green); color: #fff; }
     .chevron { color: var(--text2); font-size: 18px; transition: transform 0.2s; flex-shrink: 0; }
     .section.open .chevron { transform: rotate(90deg); }
     .sec-body { display: none; border-top: 1px solid var(--border); }
     .section.open .sec-body { display: block; }
-    .item { display: flex; align-items: center; padding: 13px 14px; gap: 12px;
-      cursor: pointer; border-bottom: 1px solid var(--border); min-height: 52px; }
+
+    /* ── ITEMS ── */
+    .item {
+      display: flex; align-items: center; padding: 13px 14px; gap: 12px;
+      cursor: pointer; border-bottom: 1px solid var(--border); min-height: 52px;
+    }
     .item:last-child { border-bottom: none; }
     .item input[type=checkbox] { display: none; }
-    .chk { width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--border);
+    .chk {
+      width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--border);
       flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s; background: var(--surface2); }
+      transition: all 0.15s; background: var(--surface2);
+    }
     .item input:checked ~ .chk { background: var(--green); border-color: var(--green); }
-    .item input:checked ~ .chk::after { content: '&#x2713;'; color: #fff; font-size: 15px; font-weight: 700; }
+    .item input:checked ~ .chk::after { content: '✓'; color: #fff; font-size: 15px; font-weight: 700; }
     .item-lbl { flex: 1; font-size: 15px; line-height: 1.3; }
     .item input:checked ~ .item-lbl { color: var(--text2); text-decoration: line-through; }
     .item-note { font-size: 12px; color: var(--text2); display: block; margin-top: 2px; }
+
+    /* ── DIVIDER LABELS ── */
     .divider-lbl { padding: 14px 14px 4px; font-size: 12px; font-weight: 600;
       color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; }
+
+    /* ── BED MAP ── */
     .bedmap-wrap { padding: 12px 14px; }
     .bedmap-tip { font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 8px; }
-    #bed-svg { width: 100%; max-width: 360px; display: block; margin: 0 auto; }
+    #bed-svg-holder svg { width: 100%; max-width: 380px; display: block; margin: 0 auto; }
     .bed-zone { cursor: pointer; transition: filter 0.15s; }
     .bed-zone:active { filter: brightness(1.5); }
-    .zone-popup { margin-top: 12px; background: var(--surface); border-radius: 12px; overflow: hidden; animation: slideUp 0.2s ease; }
+    .zone-popup {
+      margin-top: 12px; background: var(--surface); border-radius: 12px; overflow: hidden;
+      animation: slideUp 0.2s ease;
+    }
     @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .popup-hdr { padding: 13px 14px; font-weight: 600; font-size: 15px;
-      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .popup-hdr {
+      padding: 13px 14px; font-weight: 600; font-size: 15px;
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+      align-items: center;
+    }
     .popup-close { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; padding: 4px; }
+    .popup-empty { padding: 16px 14px; font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+    /* ── CALCULATOR CARDS ── */
     .calc-card { margin: 6px 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
-    .calc-hdr { padding: 13px 14px; font-weight: 600; font-size: 14px; color: var(--text2);
-      text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-    .calc-row { display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .calc-hdr { padding: 13px 14px; font-weight: 600; font-size: 14px;
+      color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border); }
+    .calc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid var(--border); gap: 8px;
+    }
     .calc-row:last-child { border-bottom: none; }
     .calc-lbl { font-size: 14px; color: var(--text2); flex: 1; }
-    .calc-val { font-size: 14px; font-weight: 600; }
-    .calc-val.pos { color: var(--green); } .calc-val.neg { color: var(--red); } .calc-val.warn { color: var(--amber); }
+    .calc-val { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .calc-val.pos { color: var(--green); }
+    .calc-val.neg { color: var(--red); }
+    .calc-val.warn { color: var(--amber); }
     .calc-row.total-row { background: var(--surface2); }
     .calc-row.total-row .calc-lbl { color: var(--text); font-weight: 600; }
+
+    /* ── PAYLOAD BAR ── */
+    .pl-bar-wrap { padding: 12px 14px; }
+    .pl-bar { height: 14px; background: var(--surface2); border-radius: 7px; overflow: hidden; }
+    .pl-bar-fill { height: 100%; border-radius: 7px; background: var(--green); transition: width 0.3s; }
+    .pl-bar-lbl { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-top: 5px; }
+
+    /* ── STAT BOXES ── */
     .stat-row { display: flex; gap: 8px; margin: 6px 14px; }
     .stat-box { flex: 1; background: var(--surface); border-radius: 12px; padding: 14px 12px; text-align: center; }
     .stat-num { font-size: 26px; font-weight: 800; line-height: 1.1; }
     .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+    /* ── SETTINGS CONTROLS ── */
     .settings-card { margin: 6px 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
-    .settings-card-hdr { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text2);
-      text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-    .setting-row { display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .settings-card-hdr { padding: 10px 14px; font-size: 12px; font-weight: 600;
+      color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border); }
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid var(--border); gap: 8px;
+    }
     .setting-row:last-child { border-bottom: none; }
     .setting-lbl { font-size: 15px; }
     .stepper { display: flex; align-items: center; gap: 14px; }
-    .stepper button { width: 34px; height: 34px; border-radius: 50%; border: none;
+    .stepper button {
+      width: 34px; height: 34px; border-radius: 50%; border: none;
       background: var(--surface2); color: var(--text); font-size: 22px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+      cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;
+    }
     .stepper-val { min-width: 22px; text-align: center; font-weight: 700; font-size: 16px; }
+    .num-input {
+      width: 76px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 15px; font-weight: 600;
+      padding: 7px 8px; text-align: right; -webkit-appearance: none;
+    }
     .toggle-grp { display: flex; background: var(--surface2); border-radius: 8px; overflow: hidden; }
-    .toggle-grp button { flex: 1; padding: 7px 10px; border: none; background: none;
-      color: var(--text2); font-size: 13px; cursor: pointer; white-space: nowrap; }
+    .toggle-grp button {
+      flex: 1; padding: 7px 10px; border: none; background: none;
+      color: var(--text2); font-size: 13px; cursor: pointer; white-space: nowrap;
+    }
     .toggle-grp button.on { background: var(--accent); color: #000; font-weight: 700; border-radius: 7px; }
-    .sw { width: 52px; height: 30px; background: var(--surface2); border-radius: 15px;
-      border: none; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
-    .sw::after { content: ''; width: 26px; height: 26px; border-radius: 50%; background: #fff;
-      position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+    .sw {
+      width: 52px; height: 30px; background: var(--surface2); border-radius: 15px;
+      border: none; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .sw::after {
+      content: ''; width: 26px; height: 26px; border-radius: 50%; background: #fff;
+      position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
     .sw.on { background: var(--green); }
     .sw.on::after { transform: translateX(22px); }
     .info-card { margin: 6px 14px; background: var(--surface); border-radius: 12px;
       padding: 14px; font-size: 13px; color: var(--text2); line-height: 1.6; }
     .info-card strong { color: var(--text); }
-    .reset-btn { margin: 12px 14px 4px; width: calc(100% - 28px); padding: 15px;
+    .info-card.flag { border: 1px solid rgba(230,150,42,0.45); }
+    .info-card ul { margin: 4px 0 0 18px; }
+    .info-card li { margin-bottom: 4px; }
+
+    .small-btn {
+      background: var(--surface2); border: none; border-radius: 8px; color: var(--text);
+      font-size: 13px; font-weight: 600; padding: 9px 13px; cursor: pointer;
+    }
+    .small-btn.danger { color: var(--red); }
+    .preset-row { display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+      border-bottom: 1px solid var(--border); }
+    .preset-row:last-child { border-bottom: none; }
+    .preset-name { flex: 1; font-size: 14px; }
+
+    /* ── RESET BUTTON ── */
+    .reset-btn {
+      margin: 12px 14px 4px; width: calc(100% - 28px); padding: 15px;
       border: 1.5px solid var(--red); border-radius: 12px; background: none;
-      color: var(--red); font-size: 15px; font-weight: 600; cursor: pointer; }
-    nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      color: var(--red); font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── TAB BAR ── */
+    nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 430px; background: var(--surface);
       border-top: 1px solid var(--border); display: flex;
-      height: var(--tab-h); padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100; }
-    .tab-btn { flex: 1; background: none; border: none; color: var(--text2); font-size: 10px;
+      height: var(--tab-h); padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100;
+    }
+    .tab-btn {
+      flex: 1; background: none; border: none; color: var(--text2); font-size: 10px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; cursor: pointer; padding: 6px 0; transition: color 0.15s; }
+      gap: 3px; cursor: pointer; padding: 6px 0; transition: color 0.15s;
+    }
     .tab-btn.on { color: var(--accent); }
     .tab-icon { font-size: 22px; line-height: 1; }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
-      z-index: 200; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 200; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
     .modal-overlay.open { display: block; }
-    .modal-box { margin: 60px 14px 40px; background: var(--surface); border-radius: 16px; overflow: hidden; }
-    .modal-hdr { padding: 16px 14px; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; }
+    .modal-box {
+      margin: 60px 14px 40px; background: var(--surface); border-radius: 16px; overflow: hidden;
+    }
+    .modal-hdr {
+      padding: 16px 14px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
     .modal-hdr .title { font-size: 17px; font-weight: 700; }
     .modal-close { background: none; border: none; color: var(--text2); font-size: 26px; cursor: pointer; }
   </style>
 </head>
 <body>
 <div id="app">
+
+  <!-- ═══ HEADER ═══ -->
   <header>
     <div class="hdr-left">
-      <div class="title">&#x2699; Gladiator Loadout</div>
-      <div class="sub" id="hdr-sub">1 person &#xB7; 2 days</div>
+      <div class="title">⚙ Gladiator Loadout</div>
+      <div class="sub" id="hdr-sub">1 person · 2 days</div>
     </div>
     <div style="text-align:right">
       <div class="hdr-pct" id="hdr-pct">0%</div>
-      <div class="hdr-pct-lbl">ready</div>
+      <div class="hdr-pct-lbl" id="hdr-pct-lbl">ready</div>
     </div>
-    <button class="settings-btn" onclick="openModal()">&#x2699;&#xFE0F;</button>
+    <button class="settings-btn" onclick="openModal()">⚙️</button>
   </header>
+
+  <!-- ═══ MAIN ═══ -->
   <main>
 
-    <!-- CHECKLIST TAB -->
+    <!-- ── CHECKLIST TAB ── -->
     <div id="tab-checklist" class="tab-pane active">
+      <div class="phase-seg" id="phase-seg"></div>
       <div id="checklist-root"></div>
-      <button class="reset-btn" onclick="doReset()">&#x21BA;  New Trip &#x2014; Reset All Checks</button>
+      <button class="reset-btn" onclick="doReset()">↺  New Trip — Reset All Checks</button>
       <div style="height:8px"></div>
     </div>
 
-    <!-- BED MAP TAB -->
+    <!-- ── BED MAP TAB ── -->
     <div id="tab-bedmap" class="tab-pane">
       <div class="bedmap-wrap">
-        <div class="bedmap-tip">Top-down view &#x2014; cab at top, tailgate at bottom. Tap a zone.</div>
-        <svg id="bed-svg" viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="292" height="442" rx="8" fill="#252527" stroke="#555" stroke-width="1.5"/>
-          <rect x="4" y="4" width="292" height="38" rx="8" fill="#333"/>
-          <rect x="4" y="28" width="292" height="14" fill="#333"/>
-          <text x="150" y="26" text-anchor="middle" fill="#888" font-size="11" font-family="-apple-system,sans-serif" font-weight="600">&#x2190; CAB WALL &#x2014; MOPAR RAIL &#x2192;</text>
-          <circle cx="56"  cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <circle cx="108" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <circle cx="196" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <circle cx="248" cy="36" r="5" fill="#777" stroke="#444" stroke-width="1"/>
-          <rect id="sv-power" class="bed-zone" data-zone="power" x="4" y="42" width="104" height="150" fill="#2a4d6a" rx="5"/>
-          <text x="56" y="110" text-anchor="middle" fill="#9ecfee" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x26A1; POWER</text>
-          <text x="56" y="126" text-anchor="middle" fill="#9ecfee" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Jackery 2000 v2</text>
-          <text id="svb-power" x="56" y="142" text-anchor="middle" fill="#9ecfee" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-          <rect id="sv-solar" class="bed-zone" data-zone="solar" x="112" y="42" width="84" height="150" fill="#5a4a1a" rx="5"/>
-          <text x="154" y="108" text-anchor="middle" fill="#ffe07a" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x2600; SOLAR</text>
-          <text x="154" y="123" text-anchor="middle" fill="#ffe07a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">SolarSaga x2</text>
-          <text x="154" y="136" text-anchor="middle" fill="#ffe07a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">+ Renogy 300W</text>
-          <text id="svb-solar" x="154" y="150" text-anchor="middle" fill="#ffe07a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/5</text>
-          <rect id="sv-fridge" class="bed-zone" data-zone="fridge" x="200" y="42" width="96" height="164" fill="#1c5a3a" rx="5"/>
-          <text x="248" y="118" text-anchor="middle" fill="#80f0b0" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F9CA; FRIDGE</text>
-          <text x="248" y="134" text-anchor="middle" fill="#80f0b0" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">CFX5 45</text>
-          <text x="248" y="147" text-anchor="middle" fill="#80f0b0" font-size="9" font-family="-apple-system,sans-serif" pointer-events="none">lid &#x2192; tailgate</text>
-          <text id="svb-fridge" x="248" y="160" text-anchor="middle" fill="#80f0b0" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-          <rect id="sv-power-connect" class="bed-zone" data-zone="power-connect" x="4" y="196" width="104" height="54" fill="#1e3a58" rx="5"/>
-          <text x="56" y="220" text-anchor="middle" fill="#7ab4d8" font-size="11" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F50C; CABLES</text>
-          <text id="svb-power-connect" x="56" y="238" text-anchor="middle" fill="#7ab4d8" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-          <rect id="sv-kitchen" class="bed-zone" data-zone="kitchen" x="112" y="196" width="84" height="114" fill="#5a3c1a" rx="5"/>
-          <text x="154" y="246" text-anchor="middle" fill="#f5c07a" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F373; KITCHEN</text>
-          <text x="154" y="261" text-anchor="middle" fill="#f5c07a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">RTIC + Table</text>
-          <text id="svb-kitchen" x="154" y="276" text-anchor="middle" fill="#f5c07a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/5</text>
-          <rect id="sv-climate" class="bed-zone" data-zone="climate" x="200" y="210" width="96" height="100" fill="#1a3a5a" rx="5"/>
-          <text x="248" y="252" text-anchor="middle" fill="#88ccff" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x2744; AC</text>
-          <text x="248" y="267" text-anchor="middle" fill="#88ccff" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Zero Breeze MK3</text>
-          <text id="svb-climate" x="248" y="282" text-anchor="middle" fill="#88ccff" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/4</text>
-          <rect id="sv-sanitation" class="bed-zone" data-zone="sanitation" x="4" y="254" width="104" height="60" fill="#3a2c4a" rx="5"/>
-          <text x="56" y="278" text-anchor="middle" fill="#c8a0f0" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F6BD; SANITATION</text>
-          <text x="56" y="293" text-anchor="middle" fill="#c8a0f0" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">GO Anywhere WC</text>
-          <text id="svb-sanitation" x="56" y="306" text-anchor="middle" fill="#c8a0f0" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-          <ellipse cx="44"  cy="368" rx="40" ry="22" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
-          <ellipse cx="258" cy="368" rx="40" ry="22" fill="#1a1a1c" stroke="#444" stroke-width="1.5"/>
-          <rect id="sv-propane" class="bed-zone" data-zone="propane" x="4" y="318" width="88" height="86" fill="#3c3c40" rx="5"/>
-          <text x="48" y="358" text-anchor="middle" fill="#c0c0c8" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F6E2; LPG</text>
-          <text x="48" y="374" text-anchor="middle" fill="#c0c0c8" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">20 lb tank</text>
-          <text id="svb-propane" x="48" y="388" text-anchor="middle" fill="#c0c0c8" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/4</text>
-          <rect id="sv-fire" class="bed-zone" data-zone="fire" x="112" y="314" width="184" height="90" fill="#6a2e0c" rx="5"/>
-          <text x="204" y="354" text-anchor="middle" fill="#f5956a" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">&#x1F525; FIRE &amp; COOK</text>
-          <text x="204" y="369" text-anchor="middle" fill="#f5956a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">Lavabox + Breeo</text>
-          <text id="svb-fire" x="204" y="384" text-anchor="middle" fill="#f5956a" font-size="10" font-family="-apple-system,sans-serif" pointer-events="none">0/3</text>
-          <rect x="4" y="408" width="292" height="38" rx="5" fill="#2a2a2c"/>
-          <text x="150" y="430" text-anchor="middle" fill="#555" font-size="10" font-family="-apple-system,sans-serif">&#x2193; TAILGATE &#x2193;</text>
-          <text x="14" y="444" fill="#444" font-size="9" font-family="-apple-system,sans-serif">DRIVER</text>
-          <text x="255" y="444" fill="#444" font-size="9" font-family="-apple-system,sans-serif">PASS.</text>
-          <text x="290" y="400" fill="#5a4a2a" font-size="9" text-anchor="end" font-family="-apple-system,sans-serif">270&#xB0; awning &#x2192;</text>
-        </svg>
+        <div class="bedmap-tip">To scale — 1px ≈ 0.2&quot;. Cab at top, tailgate at bottom. Tap any item.</div>
+        <div id="bed-svg-holder"></div>
+
+        <!-- Zone popup -->
         <div id="zone-popup" class="zone-popup" style="display:none">
           <div class="popup-hdr">
             <span id="popup-title">Zone</span>
-            <button class="popup-close" onclick="closeZonePopup()">&#x2715;</button>
+            <button class="popup-close" onclick="closeZonePopup()">✕</button>
           </div>
           <div id="popup-items"></div>
+        </div>
+
+        <!-- Payload card -->
+        <div class="calc-card" style="margin:12px 0 6px">
+          <div class="calc-hdr">Payload — Mojave</div>
+          <div class="calc-row"><div class="calc-lbl">Bed gear (this trip)</div><div class="calc-val" id="pl-gear">—</div></div>
+          <div class="calc-row"><div class="calc-lbl">Water on board</div><div class="calc-val" id="pl-water">—</div></div>
+          <div class="calc-row"><div class="calc-lbl" id="pl-people-lbl">People (1 × 200 lb)</div><div class="calc-val" id="pl-people">—</div></div>
+          <div class="calc-row"><div class="calc-lbl">Permanent build (rack, tent, awning…) <span style="font-size:11px">— estimate, edit in ⚙️</span></div><div class="calc-val" id="pl-build">—</div></div>
+          <div class="calc-row total-row"><div class="calc-lbl">Total vs payload</div><div class="calc-val" id="pl-total">—</div></div>
+          <div class="pl-bar-wrap">
+            <div class="pl-bar"><div class="pl-bar-fill" id="pl-bar"></div></div>
+            <div class="pl-bar-lbl"><span id="pl-remaining">—</span><span id="pl-limit-lbl">limit 1,200 lb</span></div>
+          </div>
+        </div>
+
+        <!-- Fit notes -->
+        <div class="info-card flag" style="margin:6px 0">
+          📐 <strong>Measured vs estimated.</strong> Bed and wheel wells are tape-measured; gear footprints are factory specs. Still estimated and flagged ⚠:
+          <ul>
+            <li>Breeo bag packed size estimated at 20×5&quot;.</li>
+            <li>GearPod XL overhang drawn at ~7&quot; over the driver rail.</li>
+            <li>ZB stack is 16&quot; tall under the GearPod (bottom ≈ rail height, 17.5&quot;) — ~1.5&quot; margin, verify.</li>
+            <li>Table + RTIC stack ≈ 19.8&quot; — pokes ~2.3&quot; above the rail, well clear of the 23&quot; bars.</li>
+          </ul>
         </div>
       </div>
     </div>
 
-    <!-- POWER TAB -->
+    <!-- ── POWER TAB ── -->
     <div id="tab-power" class="tab-pane">
 
-      <div class="divider-lbl">&#x26A1; Jackery System</div>
+      <!-- ── JACKERY SYSTEM ── -->
+      <div class="divider-lbl">⚡ Jackery System</div>
+
       <div class="stat-row">
-        <div class="stat-box"><div class="stat-num">2,042</div><div class="stat-lbl">Wh capacity</div></div>
-        <div class="stat-box"><div class="stat-num" style="color:var(--green)">1,700</div><div class="stat-lbl">Wh/day SolarSaga</div></div>
+        <div class="stat-box">
+          <div class="stat-num">2,042</div>
+          <div class="stat-lbl">Wh capacity</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--green)">1,700</div>
+          <div class="stat-lbl">Wh/day SolarSaga</div>
+        </div>
       </div>
+
       <div class="calc-card">
         <div class="calc-hdr">Jackery Daily Loads</div>
-        <div class="calc-row"><div class="calc-lbl">Dometic CFX5 45 (avg 45W)</div><div class="calc-val">1,080 Wh</div></div>
-        <div class="calc-row"><div class="calc-lbl" id="pw-phones-lbl">iPhones (1&#xD7;)</div><div class="calc-val" id="pw-phones-val">40 Wh</div></div>
-        <div class="calc-row"><div class="calc-lbl">Steam Deck</div><div class="calc-val">75 Wh</div></div>
-        <div id="pw-ac-row" class="calc-row" style="display:none">
-          <div class="calc-lbl" id="pw-ac-lbl">Zero Breeze (8h) &#x2014; via Jackery</div>
-          <div class="calc-val" id="pw-ac-val">&#x2014;</div>
+        <div class="calc-row">
+          <div class="calc-lbl">Dometic CFX5 45 (avg 45W)</div>
+          <div class="calc-val">1,080 Wh</div>
         </div>
-        <div class="calc-row total-row"><div class="calc-lbl">Total daily draw</div><div class="calc-val" id="pw-total">&#x2014;</div></div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="pw-phones-lbl">iPhones (1×)</div>
+          <div class="calc-val" id="pw-phones-val">40 Wh</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Steam Deck</div>
+          <div class="calc-val">75 Wh</div>
+        </div>
+        <div id="pw-ac-row1" class="calc-row" style="display:none">
+          <div class="calc-lbl" id="pw-ac-lbl1">ZB night 1 — internal 1,022 Wh battery covers most</div>
+          <div class="calc-val" id="pw-ac-val1">—</div>
+        </div>
+        <div id="pw-ac-row" class="calc-row" style="display:none">
+          <div class="calc-lbl" id="pw-ac-lbl">ZB after night 1 (recharges via Jackery)</div>
+          <div class="calc-val" id="pw-ac-val">—</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl" id="pw-total-lbl">Total daily draw</div>
+          <div class="calc-val" id="pw-total">—</div>
+        </div>
       </div>
+
       <div class="calc-card">
         <div class="calc-hdr">Jackery Net Balance</div>
-        <div class="calc-row"><div class="calc-lbl">SolarSaga harvest (400W, 5h, 85%)</div><div class="calc-val pos">+1,700 Wh/day</div></div>
-        <div class="calc-row"><div class="calc-lbl">Daily draw</div><div class="calc-val" id="pw-draw-lbl">&#x2014;</div></div>
-        <div class="calc-row total-row"><div class="calc-lbl">Net solar balance</div><div class="calc-val" id="pw-net">&#x2014;</div></div>
-        <div class="calc-row"><div class="calc-lbl">Battery-only reserve (no sun)</div><div class="calc-val" id="pw-reserve">&#x2014;</div></div>
+        <div class="calc-row">
+          <div class="calc-lbl">SolarSaga harvest (400W, 5h, 85%)</div>
+          <div class="calc-val pos">+1,700 Wh/day</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Daily draw</div>
+          <div class="calc-val" id="pw-draw-lbl">—</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Net solar balance</div>
+          <div class="calc-val" id="pw-net">—</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl">Battery-only reserve (no sun)</div>
+          <div class="calc-val" id="pw-reserve">—</div>
+        </div>
       </div>
 
-      <!-- ZB independent system — shown only when AC + Renogy both loaded -->
-      <div id="zb-system-wrap" style="display:none">
-        <div class="divider-lbl">&#x2744;&#xFE0F; Zero Breeze System &#x2014; Independent Loop</div>
-        <div class="stat-row">
-          <div class="stat-box"><div class="stat-num">1,022</div><div class="stat-lbl">Wh ZB battery</div></div>
-          <div class="stat-box"><div class="stat-num" style="color:var(--green)">1,275</div><div class="stat-lbl">Wh/day Renogy 300W</div></div>
+      <!-- ── TRIP PROJECTION ── -->
+      <div class="calc-card">
+        <div class="calc-hdr" id="proj-hdr">Trip Projection — 2 Days</div>
+        <div id="proj-rows"></div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Verdict</div>
+          <div class="calc-val" id="proj-verdict">—</div>
         </div>
+      </div>
+
+      <!-- ── ZERO BREEZE SYSTEM (shown only when AC + Renogy both loaded) ── -->
+      <div id="zb-system-wrap" style="display:none">
+        <div class="divider-lbl">❄️ Zero Breeze System — Independent Loop</div>
+
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-num">1,022</div>
+            <div class="stat-lbl">Wh ZB battery</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" style="color:var(--green)">1,275</div>
+            <div class="stat-lbl">Wh/day Renogy 300W</div>
+          </div>
+        </div>
+
         <div class="calc-card">
           <div class="calc-hdr">ZB Daily Load</div>
-          <div class="calc-row"><div class="calc-lbl" id="zb-ac-lbl">Zero Breeze sleep mode (8h)</div><div class="calc-val" id="zb-ac-val">&#x2014;</div></div>
-          <div class="calc-row total-row"><div class="calc-lbl">Total ZB draw</div><div class="calc-val" id="zb-total">&#x2014;</div></div>
+          <div class="calc-row">
+            <div class="calc-lbl" id="zb-ac-lbl">Zero Breeze sleep mode (8h)</div>
+            <div class="calc-val" id="zb-ac-val">—</div>
+          </div>
+          <div class="calc-row total-row">
+            <div class="calc-lbl">Total ZB draw</div>
+            <div class="calc-val" id="zb-total">—</div>
+          </div>
         </div>
+
         <div class="calc-card">
           <div class="calc-hdr">ZB Net Balance</div>
-          <div class="calc-row"><div class="calc-lbl">Renogy harvest (300W, 5h, 85%)</div><div class="calc-val pos">+1,275 Wh/day</div></div>
-          <div class="calc-row"><div class="calc-lbl">ZB daily draw</div><div class="calc-val" id="zb-draw-lbl">&#x2014;</div></div>
-          <div class="calc-row total-row"><div class="calc-lbl">Net ZB solar balance</div><div class="calc-val" id="zb-net">&#x2014;</div></div>
-          <div class="calc-row"><div class="calc-lbl">ZB battery-only reserve (no sun)</div><div class="calc-val" id="zb-reserve">&#x2014;</div></div>
+          <div class="calc-row">
+            <div class="calc-lbl">Renogy harvest (300W, 5h, 85%)</div>
+            <div class="calc-val pos">+1,275 Wh/day</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-lbl">ZB daily draw</div>
+            <div class="calc-val" id="zb-draw-lbl">—</div>
+          </div>
+          <div class="calc-row total-row">
+            <div class="calc-lbl">Net ZB solar balance</div>
+            <div class="calc-val" id="zb-net">—</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-lbl">ZB battery-only reserve (no sun)</div>
+            <div class="calc-val" id="zb-reserve">—</div>
+          </div>
         </div>
       </div>
 
-      <!-- AC settings -->
+      <!-- ── AC SETTINGS ── -->
       <div class="settings-card">
         <div class="settings-card-hdr">Zero Breeze Mark 3 AC Unit</div>
         <div class="setting-row">
@@ -290,69 +464,114 @@
           <button id="sw-renogy" class="sw" onclick="toggle('renogy')"></button>
         </div>
       </div>
-      <div class="info-card" id="pw-info-card">
-        &#x2600;&#xFE0F; <strong>Solar covers most loads</strong> on a typical desert day without the AC. The SolarSaga 400W harvest leaves ~500 Wh surplus daily for base loads.<br><br>
-        &#x1F50B; The Zero Breeze Mark 3 Plus has a <strong>built-in 1,022 Wh battery</strong> and its own Renogy solar loop &#x2014; it won't touch the Jackery when both are loaded.
-      </div>
+
+      <div class="info-card" id="pw-info-card"></div>
     </div>
 
-    <!-- WATER TAB -->
+    <!-- ── WATER TAB ── -->
     <div id="tab-water" class="tab-pane">
+
       <div class="stat-row">
-        <div class="stat-box"><div class="stat-num">6.8</div><div class="stat-lbl">gal total on board</div></div>
-        <div class="stat-box"><div class="stat-num" id="wt-days-num" style="color:var(--blue)">&#x2014;</div><div class="stat-lbl">days of water</div></div>
+        <div class="stat-box">
+          <div class="stat-num" id="wt-total-num">6.8</div>
+          <div class="stat-lbl">gal total on board</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="wt-days-num" style="color:var(--blue)">—</div>
+          <div class="stat-lbl">days of water</div>
+        </div>
       </div>
+
       <div class="calc-card">
         <div class="calc-hdr">Water Sources</div>
-        <div class="calc-row"><div class="calc-lbl">Leitner HydroPod</div><div class="calc-val">4.8 gal</div></div>
-        <div class="calc-row"><div class="calc-lbl">Rotopax 2 gal jerry can</div><div class="calc-val">2.0 gal</div></div>
-        <div class="calc-row total-row"><div class="calc-lbl">Total potable</div><div class="calc-val">6.8 gal</div></div>
+        <div class="calc-row">
+          <div class="calc-lbl">Leitner HydroPod</div>
+          <div class="calc-val">4.8 gal</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-rotopax-lbl">Rotopax 2 gal jerry can</div>
+          <div class="calc-val" id="wt-rotopax-val">2.0 gal</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Total potable</div>
+          <div class="calc-val" id="wt-src-total">6.8 gal</div>
+        </div>
       </div>
+
       <div class="calc-card">
         <div class="calc-hdr">Daily Consumption</div>
-        <div class="calc-row"><div class="calc-lbl" id="wt-drink-lbl">Drinking (1p &#xD7; 1.0 gal)</div><div class="calc-val" id="wt-drink-val">1.0 gal</div></div>
-        <div class="calc-row"><div class="calc-lbl" id="wt-cook-lbl">Cooking &amp; cleaning (1p &#xD7; 0.5)</div><div class="calc-val" id="wt-cook-val">0.5 gal</div></div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-drink-lbl">Drinking (1p × 1.0 gal)</div>
+          <div class="calc-val" id="wt-drink-val">1.0 gal</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-cook-lbl">Cooking &amp; cleaning (1p × 0.5)</div>
+          <div class="calc-val" id="wt-cook-val">0.5 gal</div>
+        </div>
         <div class="setting-row" style="border-bottom:1px solid var(--border)">
           <div class="setting-lbl" style="font-size:14px">Daily HydroPod shower</div>
           <button id="sw-shower" class="sw" onclick="toggle('showShower')"></button>
         </div>
         <div id="wt-shower-row" class="calc-row" style="display:none">
-          <div class="calc-lbl" id="wt-shower-lbl">Shower (1p &#xD7; 0.75 gal)</div><div class="calc-val">0.75 gal</div>
+          <div class="calc-lbl" id="wt-shower-lbl">Shower (1p × 0.75 gal)</div>
+          <div class="calc-val">0.75 gal</div>
         </div>
-        <div class="calc-row total-row"><div class="calc-lbl">Total per day</div><div class="calc-val" id="wt-total-day">&#x2014;</div></div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Total per day</div>
+          <div class="calc-val" id="wt-total-day">—</div>
+        </div>
       </div>
+
       <div class="calc-card">
         <div class="calc-hdr">Trip vs. Supply</div>
-        <div class="calc-row"><div class="calc-lbl" id="wt-trip-lbl">Trip duration</div><div class="calc-val" id="wt-trip-need">&#x2014;</div></div>
-        <div class="calc-row total-row"><div class="calc-lbl">Water surplus / deficit</div><div class="calc-val" id="wt-surplus">&#x2014;</div></div>
+        <div class="calc-row">
+          <div class="calc-lbl" id="wt-trip-lbl">Trip duration</div>
+          <div class="calc-val" id="wt-trip-need">—</div>
+        </div>
+        <div class="calc-row total-row">
+          <div class="calc-lbl">Water surplus / deficit</div>
+          <div class="calc-val" id="wt-surplus">—</div>
+        </div>
       </div>
-      <div class="info-card">
-        &#x1F4A7; <strong>Grayl GeoPress</strong> supplements from streams or questionable sources &#x2014; plan to use it for daytime trail drinking to preserve your tank.<br><br>
-        &#x1F6BF; The HydroPod hand pump pressurizes in ~30 strokes. A quick rinse uses ~0.5 gal; a full wash ~0.75 gal. Count carefully on multi-day trips.
+
+      <div class="info-card" id="wt-info-card">
+        💧 <strong>Grayl GeoPress</strong> supplements from streams or questionable sources — plan to use it for daytime trail drinking to preserve your tank.<br><br>
+        🚿 The HydroPod hand pump pressurizes in ~30 strokes. A quick rinse uses ≈0.5 gal; a full wash ≈0.75 gal. Count carefully on multi-day trips.
       </div>
     </div>
 
-  </main>
+  </main><!-- end main -->
 
+  <!-- ═══ TAB BAR ═══ -->
   <nav>
-    <button class="tab-btn on" data-tab="checklist" onclick="switchTab('checklist')"><span class="tab-icon">&#x2611;&#xFE0F;</span><span>Checklist</span></button>
-    <button class="tab-btn" data-tab="bedmap" onclick="switchTab('bedmap')"><span class="tab-icon">&#x1F5FA;&#xFE0F;</span><span>Bed Map</span></button>
-    <button class="tab-btn" data-tab="power" onclick="switchTab('power')"><span class="tab-icon">&#x26A1;</span><span>Power</span></button>
-    <button class="tab-btn" data-tab="water" onclick="switchTab('water')"><span class="tab-icon">&#x1F4A7;</span><span>Water</span></button>
+    <button class="tab-btn on" data-tab="checklist" onclick="switchTab('checklist')">
+      <span class="tab-icon">☑️</span><span>Checklist</span>
+    </button>
+    <button class="tab-btn" data-tab="bedmap" onclick="switchTab('bedmap')">
+      <span class="tab-icon">🗺️</span><span>Bed Map</span>
+    </button>
+    <button class="tab-btn" data-tab="power" onclick="switchTab('power')">
+      <span class="tab-icon">⚡</span><span>Power</span>
+    </button>
+    <button class="tab-btn" data-tab="water" onclick="switchTab('water')">
+      <span class="tab-icon">💧</span><span>Water</span>
+    </button>
   </nav>
-</div>
 
+</div><!-- end app -->
+
+<!-- ═══ SETTINGS MODAL ═══ -->
 <div id="modal" class="modal-overlay" onclick="modalBgClick(event)">
   <div class="modal-box">
     <div class="modal-hdr">
       <span class="title">Trip Settings</span>
-      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="settings-card" style="margin:0;border-radius:0">
       <div class="setting-row">
         <div class="setting-lbl">People on trip</div>
         <div class="stepper">
-          <button onclick="adj('guests',-1)">&#x2212;</button>
+          <button onclick="adj('guests',-1)">−</button>
           <span class="stepper-val" id="s-guests">1</span>
           <button onclick="adj('guests',1)">+</button>
         </div>
@@ -360,7 +579,7 @@
       <div class="setting-row">
         <div class="setting-lbl">Trip duration (days)</div>
         <div class="stepper">
-          <button onclick="adj('tripDays',-1)">&#x2212;</button>
+          <button onclick="adj('tripDays',-1)">−</button>
           <span class="stepper-val" id="s-days">2</span>
           <button onclick="adj('tripDays',1)">+</button>
         </div>
@@ -368,351 +587,969 @@
       <div class="setting-row">
         <div class="setting-lbl">Rotopax</div>
         <div class="toggle-grp">
-          <button id="rot-water" onclick="setRotopax('water')">&#x1F4A7; Water</button>
-          <button id="rot-gas"   onclick="setRotopax('gas')">&#x26FD; Gas</button>
+          <button id="rot-water" onclick="setRotopax('water')">💧 Water</button>
+          <button id="rot-gas"   onclick="setRotopax('gas')">⛽ Gas</button>
         </div>
       </div>
-      <div class="setting-row" style="border-bottom:none">
+      <div class="setting-row">
         <div class="setting-lbl">Permissive location<br>
           <span style="font-size:12px;color:var(--text2)">Adds rifle &amp; shotgun to security kit</span>
         </div>
         <button id="sw-perm" class="sw" onclick="toggle('permissive')"></button>
       </div>
     </div>
+
+    <div class="settings-card" style="margin:0;border-radius:0;border-top:1px solid var(--border)">
+      <div class="settings-card-hdr">Payload</div>
+      <div class="setting-row">
+        <div class="setting-lbl">Payload limit (lb)<br><span style="font-size:12px;color:var(--text2)">Mojave default — check your door sticker</span></div>
+        <input class="num-input" type="number" id="s-payload" inputmode="numeric" onchange="setNum('payloadLimit',this)">
+      </div>
+      <div class="setting-row">
+        <div class="setting-lbl">Permanent build weight (lb)<br><span style="font-size:12px;color:var(--text2)">Rack + tent + awning + GearPod etc. — estimate</span></div>
+        <input class="num-input" type="number" id="s-build" inputmode="numeric" onchange="setNum('buildLb',this)">
+      </div>
+      <div class="setting-row">
+        <div class="setting-lbl">Avg weight per person (lb)</div>
+        <input class="num-input" type="number" id="s-person" inputmode="numeric" onchange="setNum('personLb',this)">
+      </div>
+    </div>
+
+    <div class="settings-card" style="margin:0;border-radius:0;border-top:1px solid var(--border)">
+      <div class="settings-card-hdr">Trip Presets</div>
+      <div id="preset-list"></div>
+      <div class="setting-row" style="border-bottom:none">
+        <button class="small-btn" onclick="savePreset()">＋ Save current settings as preset</button>
+      </div>
+    </div>
+
+    <div class="settings-card" style="margin:0;border-radius:0;border-top:1px solid var(--border)">
+      <div class="settings-card-hdr">Backup</div>
+      <div class="setting-row" style="border-bottom:none;gap:8px">
+        <button class="small-btn" onclick="exportState()">⬆ Export</button>
+        <button class="small-btn" onclick="importState()">⬇ Import</button>
+        <span id="backup-msg" style="font-size:12px;color:var(--text2)"></span>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-const SECTIONS = [
-  { id:'rack', icon:'&#x1F527;', name:'Rack Check', items:[
-    {id:'r1', lbl:'Condor Overland tent',      note:'Stowed &#x2014; all zippers closed'},
-    {id:'r2', lbl:'Litewing 270 awning',        note:'Stowed and secured to rack'},
-    {id:'r3', lbl:'GearPod XL',                 note:'Loaded and locked'},
-    {id:'r4', lbl:'MAXTRAX panels',             note:'Mounted on GearPod rear bracket'},
-    {id:'r5', lbl:'Rotopax',                    note:'', dynamic:'rotopax'},
-    {id:'r6', lbl:'DMOS Delta Pro shovel',       note:'Mounted on passenger rail bracket'},
-    {id:'r7', lbl:'Gerber camp axe',            note:'Mounted on passenger rail bracket'},
-    {id:'r8', lbl:'HydroPod',                   note:'Ready &#x2014; filled from jerry can'},
-    {id:'r9', lbl:'Helinox Tactical chair',     note:'Stowed in GearPod'},
-  ]},
-  { id:'tent', icon:'&#x26FA;', name:'Tent Interior', dynamic:'tent', items:[] },
-  { id:'power', icon:'&#x26A1;&#xFE0F;', name:'Power Zone', zone:'power', items:[
-    {id:'pw1', lbl:'Jackery Explorer 2000 v2',  note:'Loaded &#x2014; driver side, cab-forward'},
-    {id:'pw2', lbl:'Jackery strapped down',     note:'Secured to MOPAR cab wall anchor'},
-    {id:'pw3', lbl:'Jackery charge verified',   note:'Check display &#x2014; top off if below 80%'},
-  ]},
-  { id:'solar', icon:'&#x2600;&#xFE0F;', name:'Solar Panels', zone:'solar', items:[
-    {id:'sol1', lbl:'SolarSaga 200W &#x2014; Panel 1', note:'Flat in bed, center cab-side'},
-    {id:'sol2', lbl:'SolarSaga 200W &#x2014; Panel 2', note:'Flat, stacked on Panel 1'},
-    {id:'sol3', lbl:'Renogy 300W briefcase',    note:'Stacked in solar zone &#x2014; for Zero Breeze battery charging'},
-    {id:'sol4', lbl:'Renogy MC4 cable staged',  note:'ZB solar charging cable &#x2014; accessible at camp for ZB battery'},
-    {id:'sol5', lbl:'Panels protected',          note:'Stack secured between Jackery and fridge'},
-  ]},
-  { id:'fridge', icon:'&#x1F9CA;', name:'Fridge Zone', zone:'fridge', items:[
-    {id:'fr1', lbl:'Dometic CFX5 45',            note:'Loaded &#x2014; passenger side, cab-forward'},
-    {id:'fr2', lbl:'Fridge strapped down',       note:'Secured to MOPAR cab wall anchor'},
-    {id:'fr3', lbl:'Fridge powered on',          note:'Display active &#x2014; temp set and verified'},
-  ]},
-  { id:'power-connect', icon:'&#x1F50C;', name:'Power Connections', zone:'power-connect', items:[
-    {id:'pc1', lbl:'Jackery &#x2192; Fridge DC cable',    note:'Connected and routed cleanly'},
-    {id:'pc2', lbl:'SolarSaga charging cables',    note:'Staged and accessible for camp setup'},
-    {id:'pc3', lbl:'Renogy &#x2192; Zero Breeze cable',  note:'MC4 adapter &#x2014; staged for ZB battery solar charging'},
-  ]},
-  { id:'climate', icon:'&#x2744;&#xFE0F;', name:'Climate Control', zone:'climate', items:[
-    {id:'ac1', lbl:'Zero Breeze Mark 3 unit loaded',    note:'Passenger side mid bed &#x2014; stowed for transit', dynamic:'ac'},
-    {id:'ac2', lbl:'Zero Breeze battery loaded',        note:'Charged &#x2014; check indicator before departure', dynamic:'ac'},
-    {id:'ac3', lbl:'Routed through Condor 2 HVAC ports',note:'Hose connected and seated at camp setup', dynamic:'ac'},
-    {id:'ac4', lbl:'Zero Breeze power cable staged',    note:'Accessible for connection at camp', dynamic:'ac'},
-  ]},
-  { id:'kitchen', icon:'&#x1F373;', name:'Kitchen &amp; Camp', zone:'kitchen', items:[
-    {id:'kt1', lbl:'RTIC 45L pantry',            note:'Loaded and stocked &#x2014; passenger mid'},
-    {id:'kt2', lbl:'AeroPress',                  note:'In RTIC'},
-    {id:'kt3', lbl:'Coffee supply',              note:'In RTIC'},
-    {id:'kt4', lbl:'Cookware',                   note:'In RTIC'},
-    {id:'kt5', lbl:'Pecos table',                note:'Loaded flat &#x2014; legs stored inside surface'},
-  ]},
-  { id:'fire', icon:'&#x1F525;', name:'Fire &amp; Cooking', zone:'fire', items:[
-    {id:'fi1', lbl:'Lavabox campfire',            note:'In carry bag &#x2014; loaded'},
-    {id:'fi2', lbl:'Breeo Outpost 19"',           note:'In carry bag &#x2014; loaded'},
-    {id:'fi3', lbl:'Wood / charcoal',             note:'Loaded in Overland Gear Guy bag at tailgate'},
-  ]},
-  { id:'propane', icon:'&#x1F6E2;&#xFE0F;', name:'Propane Zone', zone:'propane', items:[
-    {id:'pr1', lbl:'20 lb propane tank',         note:'Upright &#x2014; driver rear corner'},
-    {id:'pr2', lbl:'Non-slip mat',               note:'Under foot ring'},
-    {id:'pr3', lbl:'Strap #1',                   note:'Through foot ring to bed cleat'},
-    {id:'pr4', lbl:'Strap #2',                   note:'Around tank body to opposite cleat'},
-  ]},
-  { id:'sanitation', icon:'&#x1F6BD;', name:'Sanitation', zone:'sanitation', items:[
-    {id:'san1', lbl:'GO Anywhere Portable Toilet', note:'Driver mid bed &#x2014; folded flat, 19&#xD7;15&#xD7;5"'},
-    {id:'san2', lbl:'WAG BAGs loaded in toilet',   note:'50-pack stored inside folded unit'},
-    {id:'san3', lbl:'Waste bag stash verified',    note:'Each kit has TP + hand wipe &#x2014; no extras needed'},
-  ]},
-  { id:'cab', icon:'&#x1F392;', name:'Cab &amp; Personal', items:[
-    {id:'cb1', lbl:'Ruck',                        note:'Clothing + toiletries in back seat'},
-    {id:'cb2', lbl:'Security kit',               note:'Bandolier + IFAK &#x2014; loaded and accessible'},
-    {id:'cb3', lbl:'Rifle',                       note:'Staged &#x2014; permissive location', dynamic:'perm'},
-    {id:'cb4', lbl:'Shotgun',                    note:'Staged &#x2014; permissive location', dynamic:'perm'},
-    {id:'cb5', lbl:'Headlamp',                   note:'In glove box'},
-    {id:'cb6', lbl:'Phone charged',              note:'Mounted &#x2014; offline maps downloaded'},
-    {id:'cb7', lbl:'Steam Deck charged',         note:'Charged and packed'},
-  ]},
+// ════════════════════════════════════════════════════════════
+//  BED + GEAR DATA — real-world dimensions (inches / lb)
+//  Bed: Jeep Gladiator JT 5-ft box. Interior 60.3"L × 56.8"W,
+//  45.8" between wheel wells (tape-measured 5.5" wide, 31" long, starting
+//  at the cab wall), 17.5" deep, Leitner ACS bars +23" above rails.
+// ════════════════════════════════════════════════════════════
+
+const SCALE = 5; // px per inch
+const BED = { L:60.3, W:56.8, wellW:5.5, wellY:0, wellL:31, depth:17.5 };
+
+// x = inches from driver-side wall, y = inches from cab wall
+const MAP_ITEMS = [
+  { id:'m_jackery', zone:'power',         name:'JACKERY',  sub:'2000 v2',        w:15.2, l:14.4, x:6,    y:0.5,  h:11.0, lb:39.5, fill:'#2a4d6a', tcol:'#9ecfee' },
+  { id:'m_solar',   zone:'solar',         name:'SOLAR',    sub:'',               w:6.4,  l:24.2, x:21.7, y:0.5,  h:21.3, lb:27.4, lbRenogy:18.7, fill:'#5a4a1a', tcol:'#ffe07a', vert:true },
+  { id:'m_fridge',  zone:'fridge',        name:'FRIDGE',   sub:'CFX5 45 · lid→gate', w:15.7, l:27.3, x:28.6, y:0.5, h:18.7, lb:70, est:true, fill:'#1c5a3a', tcol:'#80f0b0' },
+  { id:'m_cables',  zone:'power-connect', name:'CABLES',   sub:'',               w:8,    l:6,    x:7,    y:15.5, h:6,    lb:6,  est:true, fill:'#1e3a58', tcol:'#7ab4d8' },
+  { id:'m_table',   zone:'kitchen',       name:'PECOS TABLE', sub:'flat on floor · base for stack', w:38, l:20, x:18.8, y:31, h:3, lb:25, fill:'#5a3c1a', tcol:'#f5c07a' },
+  { id:'m_rtic',    zone:'kitchen',       name:'RTIC 45 — on table', sub:'',     w:26.8, l:16.5, x:29.8, y:32.5, h:16.8, lb:45, est:true, fill:'none', tcol:'#f5c07a', dashed:true },
+  { id:'m_zb',      zone:'climate',       name:'ZB MK3',   sub:'hoses fore/aft', w:10, l:22, x:6, y:25.5, h:16, lb:36, dynamic:'ac', fill:'#1a3a5a', tcol:'#88ccff', vert:true },
+  { id:'m_propane', zone:'propane',       name:'LPG',      sub:'20 lb',    w:12.2, l:12.2, x:0.6,  y:48.1, h:17.9, lb:37, round:true, fill:'#3c3c40', tcol:'#c0c0c8' },
+  { id:'m_toilet',  zone:'sanitation',    name:'WC — on edge', sub:'',           w:19,   l:5,    x:13.5, y:51.5, h:15,   lb:13, est:true, fill:'#3a2c4a', tcol:'#c8a0f0' },
+  { id:'m_lavabox', zone:'fire',          name:'LAVABOX — on table', sub:'',     w:11,   l:5.5,  x:19.5, y:43,   h:7,    lb:14, est:true, fill:'none', tcol:'#f5956a', dashed:true },
+  { id:'m_breeo',   zone:'fire',          name:'BREEO — on edge ⚠est', sub:'',   w:20,   l:5,    x:33.5, y:55.3, h:20,   lb:10.6, est:true, fill:'#6a2e0c', tcol:'#f5956a' },
+  { id:'m_wood',    zone:'fire',          name:'WOOD BAG — off the gate', sub:'', w:16,   l:5,  x:38,   y:61.3, h:10,   lb:40, est:true, fill:'none', tcol:'#d8a070', dashed:true },
 ];
 
-const DEFAULTS = { guests:1, tripDays:2, permissive:false, rotopax:'water', acLoaded:false, acMode:'sleep', showShower:false, renogy:false };
-let S = { checked:{}, cfg:{ ...DEFAULTS } };
+// ════════════════════════════════════════════════════════════
+//  CHECKLIST DATA — phase: depart (default) | camp | packout
+// ════════════════════════════════════════════════════════════
+
+const SECTIONS = [
+  { id:'rack', icon:'🔧', name:'Rack Check',
+    items:[
+      {id:'r1', lbl:'Condor Overland tent',      note:'Stowed — all zippers closed'},
+      {id:'r2', lbl:'Litewing 270 awning',        note:'Stowed and secured to rack'},
+      {id:'r3', lbl:'GearPod XL',                 note:'Loaded and locked'},
+      {id:'r4', lbl:'MAXTRAX panels',             note:'Mounted on GearPod rear bracket'},
+      {id:'r5', lbl:'Rotopax',                    note:'', dynamic:'rotopax'},
+      {id:'r6', lbl:'DMOS Delta Pro shovel',       note:'Mounted on passenger rail bracket'},
+      {id:'r7', lbl:'Gerber camp axe',            note:'Mounted on passenger rail bracket'},
+      {id:'r8', lbl:'HydroPod',                   note:'Ready — filled from jerry can'},
+      {id:'r9', lbl:'Helinox Tactical chair',     note:'Stowed in GearPod'},
+      {id:'c_r1', lbl:'Tent opened + bedding laid out', note:'', phase:'camp'},
+      {id:'c_r2', lbl:'Awning deployed',           note:'If shade or rain cover needed', phase:'camp'},
+      {id:'c_r3', lbl:'HydroPod pressurized + flow tested', note:'~30 strokes', phase:'camp'},
+      {id:'p_r1', lbl:'Tent closed — all zippers + cover', note:'', phase:'packout'},
+      {id:'p_r2', lbl:'Awning stowed + strapped',  note:'', phase:'packout'},
+      {id:'p_r3', lbl:'MAXTRAX + shovel + axe remounted', note:'', phase:'packout'},
+    ]
+  },
+  { id:'tent', icon:'⛺', name:'Tent Interior', dynamic:'tent', items:[] },
+  { id:'power', icon:'⚡', name:'Power Zone', zone:'power',
+    items:[
+      {id:'pw1', lbl:'Jackery Explorer 2000 v2',  note:'Loaded — driver side at cab wall, inboard of wheel well'},
+      {id:'pw2', lbl:'Jackery strapped down',     note:'Secured to MOPAR cab wall anchor'},
+      {id:'pw3', lbl:'Jackery charge verified',   note:'Check display — top off if below 80%'},
+      {id:'c_pw1', lbl:'Fridge temp verified after transit', note:'', phase:'camp'},
+      {id:'p_pw1', lbl:'Cables coiled + bin stowed', note:'', phase:'packout'},
+    ]
+  },
+  { id:'solar', icon:'☀️', name:'Solar Panels', zone:'solar',
+    items:[
+      {id:'sol1', lbl:'SolarSaga 200W — Panel 1', note:'On edge between Jackery and fridge'},
+      {id:'sol2', lbl:'SolarSaga 200W — Panel 2', note:'On edge, stacked against Panel 1'},
+      {id:'sol3', lbl:'Renogy 300W briefcase',    note:'On edge in solar stack — for ZB battery charging', dynamic:'renogy'},
+      {id:'sol4', lbl:'Renogy MC4 cable staged',  note:'ZB solar charging cable — accessible at camp', dynamic:'renogy'},
+      {id:'sol5', lbl:'Stack secured',             note:'Snug between Jackery and fridge — no rattle'},
+      {id:'c_sol1', lbl:'SolarSagas deployed → Jackery', note:'Angle toward sun, cable to DC input', phase:'camp'},
+      {id:'c_sol2', lbl:'Renogy deployed → ZB battery',  note:'MC4 direct — ZB has built-in MPPT', dynamic:'renogy', phase:'camp'},
+      {id:'p_so1', lbl:'Panels folded + restacked on edge', note:'', phase:'packout'},
+    ]
+  },
+  { id:'fridge', icon:'🧊', name:'Fridge Zone', zone:'fridge',
+    items:[
+      {id:'fr1', lbl:'Dometic CFX5 45',            note:'Loaded — passenger of solar stack, lid toward tailgate'},
+      {id:'fr2', lbl:'Fridge strapped down',       note:'Secured to MOPAR cab wall anchor'},
+      {id:'fr3', lbl:'Fridge powered on',          note:'Display active — temp set and verified'},
+    ]
+  },
+  { id:'power-connect', icon:'🔌', name:'Power Connections', zone:'power-connect',
+    items:[
+      {id:'pc1', lbl:'Jackery → Fridge DC cable',    note:'Connected and routed cleanly'},
+      {id:'pc2', lbl:'SolarSaga charging cables',    note:'Staged and accessible for camp setup'},
+      {id:'pc3', lbl:'Renogy → Zero Breeze cable',  note:'MC4 adapter — staged for ZB battery solar charging', dynamic:'renogy'},
+    ]
+  },
+  { id:'climate', icon:'❄️', name:'Climate Control', zone:'climate',
+    items:[
+      {id:'ac1', lbl:'Zero Breeze Mark 3 unit loaded',    note:'Driver side mid-bed, lengthwise — fore/aft hose apertures line up with the tent ports', dynamic:'ac'},
+      {id:'ac2', lbl:'Zero Breeze battery loaded',        note:'Charged — check indicator before departure', dynamic:'ac'},
+      {id:'ac4', lbl:'Zero Breeze power cable staged',    note:'Accessible for connection at camp', dynamic:'ac'},
+      {id:'ac3', lbl:'Routed through Condor 2 HVAC ports',note:'Hose connected and seated', dynamic:'ac', phase:'camp'},
+      {id:'c_ac1', lbl:'Condensate drain set',            note:'Active drain routed clear of tent', dynamic:'ac', phase:'camp'},
+      {id:'p_ac1', lbl:'ZB hose unhooked + unit restowed', note:'', dynamic:'ac', phase:'packout'},
+    ]
+  },
+  { id:'kitchen', icon:'🍳', name:'Kitchen & Camp', zone:'kitchen',
+    items:[
+      {id:'kt1', lbl:'RTIC 45 pantry',             note:'Stocked — strapped on top of the Pecos table'},
+      {id:'kt2', lbl:'AeroPress',                  note:'In RTIC'},
+      {id:'kt3', lbl:'Coffee supply',              note:'In RTIC'},
+      {id:'kt4', lbl:'Cookware',                   note:'In RTIC'},
+      {id:'kt5', lbl:'Pecos table',                note:'Flat on floor against passenger wall — rigid base for RTIC + Lavabox'},
+      {id:'c_kt1', lbl:'Pecos table set up',        note:'', phase:'camp'},
+      {id:'c_kt2', lbl:'Camp kitchen unpacked',     note:'', phase:'camp'},
+      {id:'p_kt1', lbl:'Trash + food waste packed out', note:'', phase:'packout'},
+      {id:'p_kt2', lbl:'Table legs stowed + loaded flat', note:'', phase:'packout'},
+    ]
+  },
+  { id:'fire', icon:'🔥', name:'Fire & Cooking', zone:'fire',
+    items:[
+      {id:'fi1', lbl:'Lavabox campfire',            note:'In carry bag — on the table next to the RTIC'},
+      {id:'fi2', lbl:'Breeo Outpost 19"',           note:'In carry bag — on edge against tailgate'},
+      {id:'fi3', lbl:'Wood / charcoal',             note:'Overland Gear Guy bag — hangs off the tailgate'},
+      {id:'c_fi1', lbl:'Fire area cleared + set up', note:'Lavabox or Breeo placed, fuel staged', phase:'camp'},
+      {id:'p_fi1', lbl:'Fire DEAD OUT — coals cold to touch', note:'', phase:'packout'},
+      {id:'p_fi2', lbl:'Lavabox / Breeo cooled + bagged', note:'', phase:'packout'},
+    ]
+  },
+  { id:'propane', icon:'🛢️', name:'Propane Zone', zone:'propane',
+    items:[
+      {id:'pr1', lbl:'20 lb propane tank',         note:'Upright — driver rear corner'},
+      {id:'pr2', lbl:'Non-slip mat',               note:'Under foot ring'},
+      {id:'pr3', lbl:'Strap #1',                   note:'Through foot ring to bed cleat'},
+      {id:'pr4', lbl:'Strap #2',                   note:'Around tank body to opposite cleat'},
+      {id:'p_pr1', lbl:'Tank valve closed',         note:'', phase:'packout'},
+      {id:'p_pr2', lbl:'Tank re-strapped upright (2 straps)', note:'', phase:'packout'},
+    ]
+  },
+  { id:'sanitation', icon:'🚽', name:'Sanitation', zone:'sanitation',
+    items:[
+      {id:'san1', lbl:'GO Anywhere Portable Toilet', note:'On edge — rear band, 19×15×5" folded'},
+      {id:'san2', lbl:'WAG BAGs loaded in toilet',   note:'50-pack stored inside folded unit'},
+      {id:'san3', lbl:'Waste bag stash verified',    note:'Each kit has TP + hand wipe — no extras needed'},
+      {id:'p_sa1', lbl:'Used WAG bags sealed + packed out', note:'Regular trash OK', phase:'packout'},
+    ]
+  },
+  { id:'cab', icon:'🎒', name:'Cab & Personal',
+    items:[
+      {id:'cb1', lbl:'Ruck',                        note:'Clothing + toiletries in back seat'},
+      {id:'cb2', lbl:'Security kit',               note:'Bandolier + IFAK — loaded and accessible'},
+      {id:'cb3', lbl:'Rifle',                       note:'Staged — permissive location', dynamic:'perm'},
+      {id:'cb4', lbl:'Shotgun',                    note:'Staged — permissive location', dynamic:'perm'},
+      {id:'cb5', lbl:'Headlamp',                   note:'In glove box'},
+      {id:'cb6', lbl:'Phone charged',              note:'Mounted — offline maps downloaded'},
+      {id:'cb7', lbl:'Steam Deck charged',         note:'Charged and packed'},
+      {id:'p_cb1', lbl:'Campsite sweep — nothing left behind', note:'Walk the perimeter', phase:'packout'},
+      {id:'p_cb2', lbl:'Tailgate latched + strap check on all bed gear', note:'', phase:'packout'},
+    ]
+  },
+];
+
+const PHASES = [
+  { id:'depart',  lbl:'🚚 Departure' },
+  { id:'camp',    lbl:'⛺ Camp Setup' },
+  { id:'packout', lbl:'📦 Pack-Out' },
+];
+
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+
+const DEFAULTS = {
+  guests:1, tripDays:2, permissive:false, rotopax:'water',
+  acLoaded:false, acMode:'sleep', showShower:false, renogy:false,
+  payloadLimit:1200, buildLb:450, personLb:200,
+};
+
+let S = { checked:{}, cfg:{ ...DEFAULTS }, presets:[] };
 let openSecs = new Set(['rack']);
 let activeZone = null;
+let activePhase = 'depart';
 
 function load() {
   try {
-    const d = JSON.parse(localStorage.getItem('rig_v2') || '{}');
+    let d = JSON.parse(localStorage.getItem('rig_v3') || 'null');
+    if (!d) { // migrate v2 → v3
+      const old = JSON.parse(localStorage.getItem('rig_v2') || 'null');
+      if (old) d = { checked: old.checked, cfg: old.cfg, openSecs: old.openSecs };
+    }
+    d = d || {};
     S.checked = d.checked || {};
     S.cfg = { ...DEFAULTS, ...(d.cfg || {}) };
+    S.presets = d.presets || [];
     if (d.openSecs) openSecs = new Set(d.openSecs);
+    if (d.phase) activePhase = d.phase;
   } catch(e){}
 }
 function save() {
-  try { localStorage.setItem('rig_v2', JSON.stringify({ checked:S.checked, cfg:S.cfg, openSecs:[...openSecs] })); } catch(e){}
+  try { localStorage.setItem('rig_v3', JSON.stringify({
+    checked: S.checked, cfg: S.cfg, presets: S.presets,
+    openSecs:[...openSecs], phase: activePhase
+  })); } catch(e){}
 }
 
-function resolveItems(sec) {
+// ════════════════════════════════════════════════════════════
+//  ITEM RESOLUTION
+// ════════════════════════════════════════════════════════════
+
+function dynOK(it) {
+  if (it.dynamic === 'perm')   return S.cfg.permissive;
+  if (it.dynamic === 'ac')     return S.cfg.acLoaded;
+  if (it.dynamic === 'renogy') return S.cfg.acLoaded && S.cfg.renogy;
+  return true;
+}
+
+function resolveItems(sec, phase) {
+  phase = phase || activePhase;
   if (sec.dynamic === 'tent') {
+    if (phase !== 'depart') return [];
     const arr = [];
     for (let i=1; i<=S.cfg.guests; i++) {
-      const s = S.cfg.guests===1 ? '' : ` &#x2014; P${i}`;
+      const s = S.cfg.guests===1 ? '' : ` — P${i}`;
       arr.push({id:`t_bag_${i}`, lbl:`Sleeping bag / liner${s}`, note:'Load in Condor tent before departure'});
-      arr.push({id:`t_pil_${i}`, lbl:`Pillow${s}`, note:'Load in Condor tent before departure'});
+      arr.push({id:`t_pil_${i}`, lbl:`Pillow${s}`,               note:'Load in Condor tent before departure'});
     }
     return arr;
   }
-  return sec.items.filter(it => {
-    if (it.dynamic === 'perm') return S.cfg.permissive;
-    if (it.dynamic === 'ac')   return S.cfg.acLoaded;
-    return true;
-  });
+  return sec.items.filter(it => (it.phase || 'depart') === phase && dynOK(it));
 }
-function secProgress(sec) { const items=resolveItems(sec); return { done:items.filter(it=>S.checked[it.id]).length, total:items.length }; }
-function totalProgress() { let d=0,t=0; SECTIONS.forEach(s=>{const p=secProgress(s);d+=p.done;t+=p.total;}); return {done:d,total:t}; }
+
+function secProgress(sec, phase) {
+  const items = resolveItems(sec, phase);
+  const done = items.filter(it => S.checked[it.id]).length;
+  return { done, total: items.length };
+}
+
+function phaseProgress(phase) {
+  let done=0, total=0;
+  SECTIONS.forEach(s => { const p=secProgress(s, phase); done+=p.done; total+=p.total; });
+  return { done, total };
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — PHASES + CHECKLIST
+// ════════════════════════════════════════════════════════════
+
+function renderPhaseSeg() {
+  const seg = document.getElementById('phase-seg');
+  seg.innerHTML = PHASES.map(p => {
+    const {done,total} = phaseProgress(p.id);
+    const pct = total ? Math.round(done/total*100) : 0;
+    return `<button class="${p.id===activePhase?'on':''}" onclick="setPhase('${p.id}')">
+      ${p.lbl}<span class="ph-pct">${pct}%</span></button>`;
+  }).join('');
+}
+
+function setPhase(p) {
+  activePhase = p;
+  save();
+  renderPhaseSeg(); renderChecklist(); refreshHeader();
+}
 
 function renderChecklist() {
   const root = document.getElementById('checklist-root');
   root.innerHTML = '';
+
   SECTIONS.forEach(sec => {
     const items = resolveItems(sec);
     if (!items.length) return;
     const {done,total} = secProgress(sec);
     const pct = done/total;
-    const bc = pct===1?'done':pct>0?'partial':'';
+    const bc = pct===1 ? 'done' : pct>0 ? 'partial' : '';
     const isOpen = openSecs.has(sec.id);
+
     const el = document.createElement('div');
-    el.className = 'section'+(isOpen?' open':'');
+    el.className = 'section' + (isOpen?' open':'');
     el.id = 'sec-'+sec.id;
-    el.innerHTML = `<button class="sec-hdr" onclick="toggleSec('${sec.id}')">
-      <span class="sec-icon">${sec.icon}</span>
-      <span class="sec-name">${sec.name}</span>
-      <span class="sec-badge ${bc}" id="bd-${sec.id}">${done}/${total}</span>
-      <span class="chevron">&#x203A;</span>
-    </button><div class="sec-body">${items.map(it=>itemHTML(it,'cl-')).join('')}</div>`;
+    el.innerHTML = `
+      <button class="sec-hdr" onclick="toggleSec('${sec.id}')">
+        <span class="sec-icon">${sec.icon}</span>
+        <span class="sec-name">${sec.name}</span>
+        <span class="sec-badge ${bc}" id="bd-${sec.id}">${done}/${total}</span>
+        <span class="chevron">›</span>
+      </button>
+      <div class="sec-body">
+        ${items.map(it => itemHTML(it,'cl-')).join('')}
+      </div>`;
     root.appendChild(el);
   });
 }
 
 function itemHTML(it, prefix) {
   let lbl = it.lbl;
-  if (it.dynamic === 'rotopax') lbl = `Rotopax (${S.cfg.rotopax==='water'?'&#x1F4A7; Water':'&#x26FD; Gas'}) &#x2014; mounted and filled`;
+  if (it.dynamic === 'rotopax') {
+    const m = S.cfg.rotopax === 'water' ? '💧 Water' : '⛽ Gas';
+    lbl = `Rotopax (${m}) — mounted and filled`;
+  }
   const chk = S.checked[it.id] ? 'checked' : '';
-  return `<label class="item" for="${prefix}${it.id}">
-    <input type="checkbox" id="${prefix}${it.id}" ${chk} onchange="checkItem('${it.id}',this.checked,'${prefix}')">
-    <span class="chk"></span>
-    <span class="item-lbl">${lbl}${it.note?`<span class="item-note">${it.note}</span>`:''}</span>
-  </label>`;
+  return `
+    <label class="item" for="${prefix}${it.id}">
+      <input type="checkbox" id="${prefix}${it.id}" ${chk}
+             onchange="checkItem('${it.id}',this.checked,'${prefix}')">
+      <span class="chk"></span>
+      <span class="item-lbl">${lbl}${it.note?`<span class="item-note">${it.note}</span>`:''}</span>
+    </label>`;
 }
 
 function checkItem(id, val, fromPrefix) {
-  S.checked[id] = val; save();
+  S.checked[id] = val;
+  save();
+  // sync twin checkbox
   const other = fromPrefix==='cl-' ? 'pp-'+id : 'cl-'+id;
-  const el = document.getElementById(other); if (el) el.checked = val;
-  SECTIONS.forEach(sec => { if (resolveItems(sec).find(i=>i.id===id)) refreshSecBadge(sec); });
-  refreshHeader(); refreshBedBadges();
-}
-function refreshSecBadge(sec) {
-  const {done,total} = secProgress(sec); const pct=done/total;
-  const bc=pct===1?'done':pct>0?'partial':'';
-  const el=document.getElementById('bd-'+sec.id);
-  if (el) { el.textContent=`${done}/${total}`; el.className='sec-badge '+bc; }
-}
-function refreshHeader() {
-  const {done,total}=totalProgress();
-  document.getElementById('hdr-pct').textContent=Math.round(done/(total||1)*100)+'%';
-}
-function refreshBedBadges() {
-  ['power','solar','fridge','kitchen','climate','fire','propane','power-connect','sanitation'].forEach(zid => {
-    const sec=SECTIONS.find(s=>s.zone===zid||s.id===zid); if (!sec) return;
-    const {done,total}=secProgress(sec);
-    const el=document.getElementById('svb-'+zid); if (el) el.textContent=`${done}/${total}`;
+  const el = document.getElementById(other);
+  if (el) el.checked = val;
+  // update badges
+  SECTIONS.forEach(sec => {
+    if (resolveItems(sec).find(i=>i.id===id) || resolveItems(sec,'depart').find(i=>i.id===id)) {
+      refreshSecBadge(sec);
+    }
   });
+  refreshHeader();
+  renderPhaseSeg();
+  refreshBedBadges();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function refreshSecBadge(sec) {
+  const {done,total} = secProgress(sec);
+  if (!total) return;
+  const pct = done/total;
+  const bc = pct===1 ? 'done' : pct>0 ? 'partial' : '';
+  const el = document.getElementById('bd-'+sec.id);
+  if (el) { el.textContent=`${done}/${total}`; el.className='sec-badge '+bc; }
+}
+
+function refreshHeader() {
+  const {done,total} = phaseProgress(activePhase);
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('hdr-pct').textContent = pct+'%';
+  const lbls = {depart:'ready', camp:'set up', packout:'packed'};
+  document.getElementById('hdr-pct-lbl').textContent = lbls[activePhase];
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — BED MAP (to-scale, data-driven)
+// ════════════════════════════════════════════════════════════
+
+const OX = 10, OY = 44;                       // bed origin px (walls/cab band)
+const BW = BED.W*SCALE, BL = BED.L*SCALE;     // 284 × 301.5
+const TGH = 34;                                // tailgate band height
+const SVGW = BW + OX*2;                        // 304
+const SVGH = OY + BL + TGH + 6;
+
+function px(v){ return +(v*SCALE).toFixed(1); }
+
+function buildBedSVG() {
+  const wellY1 = OY + px(BED.wellY), wellL = px(BED.wellL), wW = px(BED.wellW);
+  let s = `<svg viewBox="0 0 ${SVGW} ${SVGH}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // outer body / walls
+  s += `<rect x="0.5" y="0.5" width="${SVGW-1}" height="${SVGH-1}" rx="10" fill="#252527" stroke="#555" stroke-width="1.5"/>`;
+  // bed rails (top face of walls)
+  s += `<rect x="2" y="${OY-4}" width="${OX-2}" height="${BL+8}" fill="#39393d"/>`;
+  s += `<rect x="${SVGW-OX}" y="${OY-4}" width="${OX-2}" height="${BL+8}" fill="#39393d"/>`;
+  // bed floor
+  s += `<rect x="${OX}" y="${OY}" width="${BW}" height="${BL}" fill="#1f1f21"/>`;
+  // floor ribs (Gladiator bed corrugation — every ~4.7")
+  for (let i=1; i<12; i++) {
+    const rx = OX + i*(BW/12);
+    s += `<line x1="${rx.toFixed(1)}" y1="${OY+2}" x2="${rx.toFixed(1)}" y2="${OY+BL-2}" stroke="#27272a" stroke-width="3"/>`;
+  }
+  // cab band + MOPAR rail
+  s += `<rect x="2" y="2" width="${SVGW-4}" height="${OY-4}" rx="8" fill="#333"/>`;
+  s += `<text x="${SVGW/2}" y="20" text-anchor="middle" fill="#888" font-size="10" font-family="-apple-system,sans-serif" font-weight="600">← CAB WALL — MOPAR RAIL →</text>`;
+  [0.18,0.38,0.62,0.82].forEach(f => {
+    s += `<circle cx="${(SVGW*f).toFixed(0)}" cy="${OY-7}" r="4.5" fill="#777" stroke="#444" stroke-width="1"/>`;
+  });
+  // 120V outlet (passenger rear of bed, real JT detail)
+  s += `<rect x="${SVGW-OX-14}" y="${OY+BL-30}" width="10" height="16" rx="2" fill="#2c2c2e" stroke="#555"/>
+        <text x="${SVGW-OX-9}" y="${OY+BL-40}" text-anchor="middle" fill="#555" font-size="6" font-family="-apple-system,sans-serif">120V</text>`;
+  // fuel filler bump (driver front exterior)
+  s += `<rect x="1" y="${OY+18}" width="7" height="34" rx="3" fill="#39393d" stroke="#4a4a4e"/>`;
+  // tie-down cleats on rails
+  [0.12, 0.5, 0.92].forEach(f => {
+    const cy = OY + BL*f;
+    s += `<rect x="${OX-7}" y="${cy-5}" width="6" height="10" rx="2" fill="#666"/>`;
+    s += `<rect x="${SVGW-OX+1}" y="${cy-5}" width="6" height="10" rx="2" fill="#666"/>`;
+  });
+
+  // wheel wells (position estimated ⚠)
+  [[OX, 'driver'],[SVGW-OX-wW, 'pass']].forEach(([wx]) => {
+    s += `<rect x="${wx}" y="${wellY1}" width="${wW}" height="${wellL}" rx="9" fill="#141416" stroke="#4a4a4e" stroke-width="1.5"/>`;
+    s += `<rect x="${wx}" y="${wellY1+10}" width="${wW}" height="${wellL-20}" fill="#0f0f10"/>`;
+  });
+  s += `<text x="${SVGW-OX-wW/2}" y="${wellY1+wellL/2}" fill="#6a6a70" font-size="8" font-family="-apple-system,sans-serif" text-anchor="middle" transform="rotate(90 ${SVGW-OX-wW/2} ${wellY1+wellL/2})">WHEEL WELL</text>`;
+
+  // GearPod XL overhang (driver side, above bed — intrusion estimated)
+  s += `<rect x="${OX}" y="${OY+px(3)}" width="${px(7)}" height="${px(48)}" fill="rgba(200,168,107,0.10)" stroke="#c8a86b" stroke-width="1" stroke-dasharray="5,4" rx="4" pointer-events="none"/>`;
+  s += `<text x="${OX+px(3.5)}" y="${OY+px(27)}" fill="#c8a86b" font-size="8" font-family="-apple-system,sans-serif" opacity="0.75" text-anchor="middle" transform="rotate(-90 ${OX+px(3.5)} ${OY+px(27)})">GEARPOD XL ABOVE ⚠est</text>`;
+
+  // tailgate
+  const ty = OY + BL;
+  s += `<rect x="2" y="${ty+2}" width="${SVGW-4}" height="${TGH-4}" rx="6" fill="#2a2a2c" stroke="#48484a" stroke-width="1"/>`;
+  s += `<rect x="${SVGW/2-30}" y="${ty+5}" width="60" height="7" rx="3" fill="#222"/>`;
+  s += `<text x="${SVGW/2}" y="${ty+25}" text-anchor="middle" fill="#4f4f52" font-size="11" font-family="-apple-system,sans-serif" font-weight="800" letter-spacing="3">GLADIATOR</text>`;
+  s += `<text x="${OX+4}" y="${ty+25}" fill="#444" font-size="8" font-family="-apple-system,sans-serif">DRIVER</text>`;
+  s += `<text x="${SVGW-OX-4}" y="${ty+25}" text-anchor="end" fill="#444" font-size="8" font-family="-apple-system,sans-serif">PASS.</text>`;
+
+  // gear items
+  MAP_ITEMS.forEach(it => {
+    const ix = OX + px(it.x), iy = OY + px(it.y), iw = px(it.w), il = px(it.l);
+    const dyn = it.dynamic==='ac' ? ` data-dyn="ac"` : '';
+    const grp = `<g id="g-${it.id}" class="bed-zone" data-zone="${it.zone}"${dyn}>`;
+    if (it.dashed) {
+      const ly = it.y >= BED.L ? iy + il/2 + 3 : iy - 3;
+      s += grp + `<rect x="${ix}" y="${iy}" width="${iw}" height="${il}" rx="4" fill="none" stroke="${it.tcol}" stroke-width="1.2" stroke-dasharray="6,4" opacity="0.7"/>
+        <text x="${ix+iw/2}" y="${ly}" text-anchor="middle" fill="${it.tcol}" font-size="8" font-family="-apple-system,sans-serif" opacity="0.85">${it.name}</text></g>`;
+      return;
+    }
+    if (it.round) {
+      const r = iw/2;
+      s += grp + `<circle id="sh-${it.id}" cx="${ix+r}" cy="${iy+r}" r="${r}" fill="${it.fill}" stroke="#000" stroke-width="1" stroke-opacity="0.3"/>
+        <circle cx="${ix+r}" cy="${iy+r}" r="${(r*0.55).toFixed(1)}" fill="none" stroke="${it.tcol}" stroke-width="1" opacity="0.4"/>
+        <text x="${ix+r}" y="${iy+r-3}" text-anchor="middle" fill="${it.tcol}" font-size="10" font-weight="700" font-family="-apple-system,sans-serif" pointer-events="none">${it.name}</text>
+        <text id="svb-${it.zone}" x="${ix+r}" y="${iy+r+10}" text-anchor="middle" fill="${it.tcol}" font-size="9" font-family="-apple-system,sans-serif" pointer-events="none">0/0</text></g>`;
+      return;
+    }
+    s += grp + `<rect id="sh-${it.id}" x="${ix}" y="${iy}" width="${iw}" height="${il}" rx="4" fill="${it.fill}" stroke="#000" stroke-width="1" stroke-opacity="0.3"/>`;
+    const cx = ix+iw/2, cy = iy+il/2;
+    const badge = isPrimary(it) ? `<text id="svb-${it.zone}" class="svb" x="0" y="11" text-anchor="middle" fill="${it.tcol}" font-size="9" font-family="-apple-system,sans-serif" pointer-events="none">0/0</text>` : '';
+    const sub = it.sub ? `<text x="0" y="${isPrimary(it)?22:11}" text-anchor="middle" fill="${it.tcol}" font-size="8" font-family="-apple-system,sans-serif" opacity="0.8" pointer-events="none">${it.sub}</text>` : '';
+    const rot = it.vert ? ` rotate(-90)` : '';
+    s += `<g transform="translate(${cx} ${cy})${rot}" pointer-events="none">
+      <text x="0" y="${(badge||sub)?-1:3}" text-anchor="middle" fill="${it.tcol}" font-size="10" font-weight="700" font-family="-apple-system,sans-serif">${it.name}</text>
+      ${badge}${sub}</g></g>`;
+  });
+
+  // dimension callouts
+  s += `<text x="${SVGW-OX-4}" y="${OY+12}" text-anchor="end" fill="#55554f" font-size="8" font-family="-apple-system,sans-serif">56.8&quot; wide</text>`;
+  s += `<text x="${OX+4}" y="${OY+BL-6}" fill="#55554f" font-size="8" font-family="-apple-system,sans-serif">60.3&quot; long · 45.8&quot; between wells</text>`;
+  s += `</svg>`;
+
+  document.getElementById('bed-svg-holder').innerHTML = s;
   document.querySelectorAll('.bed-zone').forEach(el => {
     el.addEventListener('click', function() { onZoneClick(this.dataset.zone); });
   });
-});
+}
+
+function isPrimary(it) {
+  // first non-dashed item of each zone carries the zone badge
+  return MAP_ITEMS.find(m => m.zone===it.zone && !m.dashed) === it;
+}
+
+function refreshBedBadges() {
+  const zoneSet = [...new Set(MAP_ITEMS.map(m=>m.zone))];
+  zoneSet.forEach(zid => {
+    const sec = SECTIONS.find(s=>s.zone===zid||s.id===zid);
+    if (!sec) return;
+    const {done,total} = secProgress(sec,'depart');
+    const el = document.getElementById('svb-'+zid);
+    if (el) el.textContent = total ? `${done}/${total}` : '—';
+    // completion coloring + dynamic dimming
+    MAP_ITEMS.filter(m=>m.zone===zid && !m.dashed).forEach(m => {
+      const g = document.getElementById('g-'+m.id);
+      const sh = document.getElementById('sh-'+m.id);
+      if (!g || !sh) return;
+      const off = m.dynamic==='ac' && !S.cfg.acLoaded;
+      g.style.opacity = off ? 0.25 : 1;
+      if (off || !total) { sh.setAttribute('stroke','#000'); sh.setAttribute('stroke-opacity','0.3'); sh.setAttribute('stroke-width','1'); return; }
+      if (done===total)      { sh.setAttribute('stroke','#4a9c6d'); sh.setAttribute('stroke-opacity','1'); sh.setAttribute('stroke-width','2.5'); }
+      else if (done>0)       { sh.setAttribute('stroke','#e6962a'); sh.setAttribute('stroke-opacity','1'); sh.setAttribute('stroke-width','2'); }
+      else                   { sh.setAttribute('stroke','#000');    sh.setAttribute('stroke-opacity','0.3'); sh.setAttribute('stroke-width','1'); }
+    });
+  });
+}
+
 function onZoneClick(zid) {
-  if (activeZone===zid) { closeZonePopup(); return; }
-  if (activeZone) { const p=document.getElementById('sv-'+activeZone); if (p) p.style.filter=''; }
-  activeZone=zid;
-  const el=document.getElementById('sv-'+zid); if (el) el.style.filter='brightness(1.5)';
-  const sec=SECTIONS.find(s=>s.zone===zid||s.id===zid); if (!sec) return;
-  const items=resolveItems(sec);
-  document.getElementById('popup-title').textContent=sec.icon+' '+sec.name;
-  document.getElementById('popup-items').innerHTML=items.map(it=>itemHTML(it,'pp-')).join('');
-  const popup=document.getElementById('zone-popup'); popup.style.display='';
+  if (activeZone === zid) { closeZonePopup(); return; }
+  closeZonePopup();
+  activeZone = zid;
+  renderZonePopup();
+  const popup = document.getElementById('zone-popup');
+  popup.style.display='';
   setTimeout(()=>popup.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }
+
+function renderZonePopup() {
+  if (!activeZone) return;
+  const sec = SECTIONS.find(s=>s.zone===activeZone||s.id===activeZone);
+  if (!sec) return;
+  MAP_ITEMS.filter(m=>m.zone===activeZone).forEach(m => {
+    const sh = document.getElementById('sh-'+m.id);
+    if (sh) sh.style.filter='brightness(1.5)';
+  });
+  const items = resolveItems(sec,'depart');
+  document.getElementById('popup-title').textContent = sec.icon+' '+sec.name;
+  const body = document.getElementById('popup-items');
+  if (!items.length) {
+    body.innerHTML = `<div class="popup-empty">Not loaded this trip — enable Zero Breeze in the ⚡ Power tab to add these items.</div>`;
+  } else {
+    body.innerHTML = items.map(it=>itemHTML(it,'pp-')).join('');
+  }
+}
+
 function closeZonePopup() {
-  if (activeZone) { const el=document.getElementById('sv-'+activeZone); if (el) el.style.filter=''; activeZone=null; }
+  if (activeZone) {
+    MAP_ITEMS.filter(m=>m.zone===activeZone).forEach(m => {
+      const sh = document.getElementById('sh-'+m.id);
+      if (sh) sh.style.filter='';
+    });
+    activeZone = null;
+  }
   document.getElementById('zone-popup').style.display='none';
 }
 
-// POWER CONSTANTS
-const FRIDGE_WH=1080, PHONE_WH=40, DECK_WH=75;
-const SOLAR_WH=1700;   // SolarSaga 400W x 5h x 85%
-const RENOGY_WH=1275;  // Renogy 300W x 5h x 85%
-const JACKERY_WH=2042, ZB_WH=1022;
-const AC_W={sleep:150,medium:300,full:500}, AC_HOURS=8;
+// ════════════════════════════════════════════════════════════
+//  RENDER — PAYLOAD
+// ════════════════════════════════════════════════════════════
+
+const LB_PER_GAL_WATER = 8.34;
+const LB_PER_GAL_GAS = 6.3;
+
+function gearWeight() {
+  let lb = 0;
+  MAP_ITEMS.forEach(it => {
+    if (it.dynamic==='ac' && !S.cfg.acLoaded) return;
+    lb += it.lb;
+    if (it.lbRenogy && S.cfg.acLoaded && S.cfg.renogy) lb += it.lbRenogy;
+  });
+  return lb;
+}
+
+function waterWeight() {
+  let lb = 4.8 * LB_PER_GAL_WATER + 4;             // HydroPod + housing est
+  lb += S.cfg.rotopax==='water' ? 2*LB_PER_GAL_WATER + 5 : 2*LB_PER_GAL_GAS + 5; // Rotopax + can
+  return lb;
+}
+
+function renderPayload() {
+  const g = S.cfg;
+  const gear = gearWeight();
+  const water = waterWeight();
+  const people = g.guests * g.personLb;
+  const total = gear + water + people + g.buildLb;
+  const remaining = g.payloadLimit - total;
+  const pct = Math.min(100, total / g.payloadLimit * 100);
+
+  document.getElementById('pl-gear').textContent  = Math.round(gear)+' lb';
+  document.getElementById('pl-water').textContent = Math.round(water)+' lb';
+  document.getElementById('pl-people-lbl').textContent = `People (${g.guests} × ${g.personLb} lb)`;
+  document.getElementById('pl-people').textContent = people+' lb';
+  document.getElementById('pl-build').textContent  = g.buildLb+' lb';
+  const tEl = document.getElementById('pl-total');
+  tEl.textContent = `${Math.round(total).toLocaleString()} / ${g.payloadLimit.toLocaleString()} lb`;
+  tEl.className = 'calc-val ' + (remaining>=150?'pos':remaining>=0?'warn':'neg');
+  const bar = document.getElementById('pl-bar');
+  bar.style.width = pct+'%';
+  bar.style.background = remaining>=150?'var(--green)':remaining>=0?'var(--amber)':'var(--red)';
+  document.getElementById('pl-remaining').textContent =
+    remaining>=0 ? `${Math.round(remaining)} lb headroom` : `${Math.round(-remaining)} lb OVER`;
+  document.getElementById('pl-limit-lbl').textContent = `limit ${g.payloadLimit.toLocaleString()} lb`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — POWER
+// ════════════════════════════════════════════════════════════
+
+const FRIDGE_WH  = 1080;  // 45W × 24h
+const PHONE_WH   = 40;    // per person/day
+const DECK_WH    = 75;
+const SOLAR_WH   = 1700;  // SolarSaga 400W × 5h × 85%
+const RENOGY_WH  = 1275;  // Renogy 300W × 5h × 85%
+const JACKERY_WH = 2042;
+const ZB_WH      = 1022;  // Zero Breeze dedicated battery
+const AC_W       = {sleep:150, medium:300, full:500};
+const AC_HOURS   = 8;
 
 function renderPower() {
-  const g=S.cfg;
-  const phonesWh=g.guests*PHONE_WH;
-  const zbOnJackery=g.acLoaded&&!g.renogy;
-  const acWh=zbOnJackery?AC_W[g.acMode]*AC_HOURS:0;
-  const jDraw=FRIDGE_WH+phonesWh+DECK_WH+acWh;
-  const jNet=SOLAR_WH-jDraw, jRes=JACKERY_WH/jDraw;
+  const g = S.cfg;
+  const phonesWh  = g.guests * PHONE_WH;
+  const baseDraw  = FRIDGE_WH + phonesWh + DECK_WH;
+  const acWh      = AC_W[g.acMode] * AC_HOURS;
+  const zbOnJackery = g.acLoaded && !g.renogy;
+  // Night 1 the ZB's internal 1,022 Wh battery absorbs the first chunk;
+  // steady state the Jackery carries the full AC load (it recharges the ZB).
+  const acNight1  = zbOnJackery ? Math.max(0, acWh - ZB_WH) : 0;
+  const jDraw     = baseDraw + (zbOnJackery ? acWh : 0);       // steady state
+  const jDrawN1   = baseDraw + acNight1;
+  const jNet      = SOLAR_WH - jDraw;
+  const jReserve  = JACKERY_WH / jDraw;
 
-  document.getElementById('pw-phones-lbl').textContent=`iPhones (${g.guests}&#xD7;)`;
-  document.getElementById('pw-phones-val').textContent=`${phonesWh} Wh`;
-  document.getElementById('pw-ac-row').style.display=zbOnJackery?'':'none';
+  document.getElementById('pw-phones-lbl').textContent = `iPhones (${g.guests}×)`;
+  document.getElementById('pw-phones-val').textContent  = `${phonesWh} Wh`;
+
+  document.getElementById('pw-ac-row1').style.display = zbOnJackery ? '' : 'none';
+  document.getElementById('pw-ac-row').style.display  = zbOnJackery ? '' : 'none';
   if (zbOnJackery) {
-    document.getElementById('pw-ac-lbl').textContent=`Zero Breeze ${g.acMode} (${AC_HOURS}h) &#x2014; via Jackery`;
-    document.getElementById('pw-ac-val').textContent=`${acWh.toLocaleString()} Wh`;
+    document.getElementById('pw-ac-lbl1').textContent = `ZB ${g.acMode} night 1 — internal battery covers first 1,022 Wh`;
+    document.getElementById('pw-ac-val1').textContent = `${acNight1.toLocaleString()} Wh`;
+    document.getElementById('pw-ac-lbl').textContent  = `ZB ${g.acMode} after night 1 (Jackery recharges ZB)`;
+    document.getElementById('pw-ac-val').textContent  = `${acWh.toLocaleString()} Wh`;
   }
-  document.getElementById('pw-total').textContent=`${jDraw.toLocaleString()} Wh`;
-  document.getElementById('pw-draw-lbl').textContent=`&#x2212;${jDraw.toLocaleString()} Wh/day`;
-  const netEl=document.getElementById('pw-net');
-  netEl.textContent=(jNet>=0?'+':'')+jNet.toLocaleString()+' Wh/day';
-  netEl.className='calc-val '+(jNet>=0?'pos':jNet>-500?'warn':'neg');
-  const resEl=document.getElementById('pw-reserve');
-  resEl.textContent=jRes>=1?jRes.toFixed(1)+' days':(jRes*24).toFixed(1)+' hrs';
-  resEl.className='calc-val '+(jRes>=1?'pos':jRes>=0.5?'warn':'neg');
+  document.getElementById('pw-total-lbl').textContent = zbOnJackery ? 'Total daily draw (steady state)' : 'Total daily draw';
+  document.getElementById('pw-total').textContent    = `${jDraw.toLocaleString()} Wh`;
+  document.getElementById('pw-draw-lbl').textContent = `−${jDraw.toLocaleString()} Wh/day`;
 
-  const zbInd=g.acLoaded&&g.renogy;
-  document.getElementById('zb-system-wrap').style.display=zbInd?'':'none';
-  if (zbInd) {
-    const zbDraw=AC_W[g.acMode]*AC_HOURS, zbNet=RENOGY_WH-zbDraw, zbRes=ZB_WH/zbDraw;
-    document.getElementById('zb-ac-lbl').textContent=`Zero Breeze ${g.acMode} mode (${AC_HOURS}h)`;
-    document.getElementById('zb-ac-val').textContent=`${zbDraw.toLocaleString()} Wh`;
-    document.getElementById('zb-total').textContent=`${zbDraw.toLocaleString()} Wh`;
-    document.getElementById('zb-draw-lbl').textContent=`&#x2212;${zbDraw.toLocaleString()} Wh/day`;
-    const zbNetEl=document.getElementById('zb-net');
-    zbNetEl.textContent=(zbNet>=0?'+':'')+zbNet.toLocaleString()+' Wh/day';
-    zbNetEl.className='calc-val '+(zbNet>=0?'pos':zbNet>-200?'warn':'neg');
-    const zbResEl=document.getElementById('zb-reserve');
-    zbResEl.textContent=zbRes>=1?zbRes.toFixed(1)+' days':(zbRes*24).toFixed(1)+' hrs';
-    zbResEl.className='calc-val '+(zbRes>=1?'pos':zbRes>=0.5?'warn':'neg');
+  const netEl = document.getElementById('pw-net');
+  netEl.textContent = (jNet>=0?'+':'')+jNet.toLocaleString()+' Wh/day';
+  netEl.className   = 'calc-val '+(jNet>=0?'pos':jNet>-500?'warn':'neg');
+
+  const resEl = document.getElementById('pw-reserve');
+  const rStr  = jReserve>=1 ? jReserve.toFixed(1)+' days' : (jReserve*24).toFixed(1)+' hrs';
+  resEl.textContent = rStr;
+  resEl.className   = 'calc-val '+(jReserve>=1?'pos':jReserve>=0.5?'warn':'neg');
+
+  // ── Trip projection (Jackery loop, full sun assumed)
+  renderProjection(jDrawN1, jDraw);
+
+  // ── Zero Breeze independent system
+  const zbIndependent = g.acLoaded && g.renogy;
+  document.getElementById('zb-system-wrap').style.display = zbIndependent ? '' : 'none';
+
+  if (zbIndependent) {
+    const zbDrawWh = acWh;
+    const zbNet    = RENOGY_WH - zbDrawWh;
+    const zbRes    = ZB_WH / zbDrawWh;
+    const zbResStr = zbRes>=1 ? zbRes.toFixed(1)+' days' : (zbRes*24).toFixed(1)+' hrs';
+
+    document.getElementById('zb-ac-lbl').textContent  = `Zero Breeze ${g.acMode} mode (${AC_HOURS}h)`;
+    document.getElementById('zb-ac-val').textContent  = `${zbDrawWh.toLocaleString()} Wh`;
+    document.getElementById('zb-total').textContent   = `${zbDrawWh.toLocaleString()} Wh`;
+    document.getElementById('zb-draw-lbl').textContent = `−${zbDrawWh.toLocaleString()} Wh/day`;
+
+    const zbNetEl = document.getElementById('zb-net');
+    zbNetEl.textContent = (zbNet>=0?'+':'')+zbNet.toLocaleString()+' Wh/day';
+    zbNetEl.className   = 'calc-val '+(zbNet>=0?'pos':zbNet>-200?'warn':'neg');
+
+    const zbResEl = document.getElementById('zb-reserve');
+    zbResEl.textContent = zbResStr;
+    zbResEl.className   = 'calc-val '+(zbRes>=1?'pos':zbRes>=0.5?'warn':'neg');
   }
 
-  ['sleep','medium','full'].forEach(m=>{ const b=document.getElementById('acm-'+m); if(b) b.className=m===g.acMode?'on':''; });
-  document.getElementById('sw-ac').className='sw'+(g.acLoaded?' on':'');
-  document.getElementById('sw-renogy').className='sw'+(g.renogy?' on':'');
-  document.getElementById('ac-mode-wrap').style.display=g.acLoaded?'':'none';
-  document.getElementById('renogy-wrap').style.display=g.acLoaded?'':'none';
+  // ── AC settings toggles
+  ['sleep','medium','full'].forEach(m => {
+    const b = document.getElementById('acm-'+m);
+    if (b) b.className = m===g.acMode?'on':'';
+  });
+  document.getElementById('sw-ac').className     = 'sw'+(g.acLoaded?' on':'');
+  document.getElementById('sw-renogy').className = 'sw'+(g.renogy?' on':'');
+  document.getElementById('ac-mode-wrap').style.display  = g.acLoaded ? '' : 'none';
+  document.getElementById('renogy-wrap').style.display   = g.acLoaded ? '' : 'none';
 
-  const infoEl=document.getElementById('pw-info-card');
-  if (zbInd) {
-    infoEl.innerHTML='&#x2600;&#xFE0F; <strong>Two independent solar loops.</strong> The Jackery handles all base camp loads &#x2014; fridge, devices. The Renogy 300W feeds the ZB battery directly, keeping the AC completely off the Jackery circuit.<br><br>&#x1F4CA; At sleep mode (150W &#xD7; 8h = 1,200 Wh), the Renogy\'s 1,275 Wh/day harvest nearly covers a full night &#x2014; the ZB battery covers any overnight gap.';
+  // ── Info card text
+  const infoEl = document.getElementById('pw-info-card');
+  if (zbIndependent) {
+    infoEl.innerHTML = '☀️ <strong>Two independent solar loops.</strong> The Jackery handles all base camp loads — fridge, devices. The Renogy 300W feeds the ZB battery directly, keeping the AC completely off the Jackery circuit.<br><br>📊 At sleep mode (150W × 8h = 1,200 Wh), the Renogy\'s 1,275 Wh/day harvest nearly covers a full night — the ZB battery covers any overnight gap.';
   } else if (g.acLoaded) {
-    infoEl.innerHTML='&#x26A0;&#xFE0F; <strong>ZB drawing from Jackery</strong> &#x2014; Renogy briefcase not toggled on. At sleep mode nightly you\'ll draw ~200&#x2013;400 Wh net from the Jackery. Enable the Renogy toggle above to isolate the ZB to its own loop.';
+    infoEl.innerHTML = '⚠️ <strong>ZB drawing from Jackery</strong> — Renogy briefcase not loaded. Night 1 the ZB\'s internal 1,022 Wh battery absorbs most of the load, but every day after, the Jackery carries the full AC draw to recharge it. Load the Renogy to isolate the ZB on its own loop.';
   } else {
-    infoEl.innerHTML='&#x2600;&#xFE0F; <strong>Solar covers most loads</strong> on a typical desert day without the AC. The SolarSaga 400W harvest leaves ~500 Wh surplus daily for base loads.<br><br>&#x1F50B; The Zero Breeze Mark 3 Plus has a <strong>built-in 1,022 Wh battery</strong> and its own Renogy solar loop &#x2014; it won\'t touch the Jackery when both are loaded.';
+    infoEl.innerHTML = '☀️ <strong>Solar covers most loads</strong> on a typical desert day without the AC. The SolarSaga 400W harvest leaves ~500 Wh surplus daily for base loads.<br><br>🔋 The Zero Breeze Mark 3 Plus has a <strong>built-in 1,022 Wh battery</strong> and its own Renogy solar loop — it won\'t touch the Jackery when both are loaded.';
   }
 }
 
-// WATER
-const HYDROPOD=4.8, ROTOPAX=2.0, TOTAL_W=6.8, DRINK_PP=1.0, COOK_PP=0.5, SHOWER_PP=0.75;
-function renderWater() {
-  const g=S.cfg;
-  const drink=g.guests*DRINK_PP, cook=g.guests*COOK_PP;
-  const shower=g.showShower?g.guests*SHOWER_PP:0;
-  const perDay=drink+cook+shower, days=TOTAL_W/perDay;
-  const tripNeed=perDay*g.tripDays, surplus=TOTAL_W-tripNeed;
-  document.getElementById('wt-drink-lbl').textContent=`Drinking (${g.guests}p &#xD7; 1.0 gal)`;
-  document.getElementById('wt-drink-val').textContent=drink.toFixed(1)+' gal';
-  document.getElementById('wt-cook-lbl').textContent=`Cooking &amp; cleaning (${g.guests}p &#xD7; 0.5)`;
-  document.getElementById('wt-cook-val').textContent=cook.toFixed(1)+' gal';
-  document.getElementById('wt-shower-row').style.display=g.showShower?'':'none';
-  if (g.showShower) document.getElementById('wt-shower-lbl').textContent=`Shower (${g.guests}p &#xD7; 0.75 gal)`;
-  document.getElementById('wt-total-day').textContent=perDay.toFixed(2)+' gal/day';
-  const daysEl=document.getElementById('wt-days-num');
-  daysEl.textContent=days.toFixed(1);
-  daysEl.style.color=days>=3?'var(--green)':days>=1.5?'var(--amber)':'var(--red)';
-  document.getElementById('wt-trip-lbl').textContent=`Trip (${g.tripDays}d &#xD7; ${perDay.toFixed(2)} gal)`;
-  document.getElementById('wt-trip-need').textContent=tripNeed.toFixed(2)+' gal needed';
-  const surEl=document.getElementById('wt-surplus');
-  surEl.textContent=(surplus>=0?'+':'')+surplus.toFixed(2)+' gal';
-  surEl.className='calc-val '+(surplus>=0?'pos':surplus>=-1?'warn':'neg');
-  document.getElementById('sw-shower').className='sw'+(g.showShower?' on':'');
+function renderProjection(drawDay1, drawSteady) {
+  const g = S.cfg;
+  document.getElementById('proj-hdr').textContent =
+    `Trip Projection — ${g.tripDays} Day${g.tripDays!==1?'s':''} (full sun)`;
+  const rows = document.getElementById('proj-rows');
+  let batt = JACKERY_WH, minBatt = JACKERY_WH, failDay = 0;
+  let html = '';
+  for (let d=1; d<=g.tripDays; d++) {
+    const draw = d===1 ? drawDay1 : drawSteady;
+    batt = batt - draw + SOLAR_WH;
+    if (batt < 0 && !failDay) failDay = d;
+    minBatt = Math.min(minBatt, batt);
+    batt = Math.min(JACKERY_WH, Math.max(batt, -1));
+    const pct = Math.max(0, Math.round(batt/JACKERY_WH*100));
+    const cls = pct>=50?'pos':pct>=20?'warn':'neg';
+    if (g.tripDays<=7) html += `<div class="calc-row"><div class="calc-lbl">End of day ${d}</div><div class="calc-val ${cls}">${failDay&&d>=failDay?'EMPTY':pct+'%'}</div></div>`;
+  }
+  if (g.tripDays>7) {
+    const pct = Math.max(0, Math.round(minBatt/JACKERY_WH*100));
+    html = `<div class="calc-row"><div class="calc-lbl">Lowest point across ${g.tripDays} days</div><div class="calc-val ${pct>=50?'pos':pct>=20?'warn':'neg'}">${failDay?'EMPTY day '+failDay:pct+'%'}</div></div>`;
+  }
+  rows.innerHTML = html;
+  const v = document.getElementById('proj-verdict');
+  if (failDay) { v.textContent = `Runs dry day ${failDay}`; v.className='calc-val neg'; }
+  else {
+    const endPct = Math.max(0, Math.round(batt/JACKERY_WH*100));
+    v.textContent = `Survives trip — ends at ${endPct}%`;
+    v.className = 'calc-val ' + (endPct>=50?'pos':'warn');
+  }
 }
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — WATER
+// ════════════════════════════════════════════════════════════
+
+const HYDROPOD = 4.8;
+const ROTOPAX_GAL = 2.0;
+const DRINK_PP = 1.0;
+const COOK_PP  = 0.5;
+const SHOWER_PP= 0.75;
+
+function renderWater() {
+  const g = S.cfg;
+  const rotoWater = g.rotopax === 'water';
+  const totalW = HYDROPOD + (rotoWater ? ROTOPAX_GAL : 0);
+  const drink  = g.guests * DRINK_PP;
+  const cook   = g.guests * COOK_PP;
+  const shower = g.showShower ? g.guests * SHOWER_PP : 0;
+  const perDay = drink + cook + shower;
+  const days   = totalW / perDay;
+  const tripNeed = perDay * g.tripDays;
+  const surplus  = totalW - tripNeed;
+
+  document.getElementById('wt-total-num').textContent = totalW.toFixed(1);
+  document.getElementById('wt-rotopax-lbl').textContent =
+    rotoWater ? 'Rotopax 2 gal jerry can' : 'Rotopax — ⛽ gas mode';
+  document.getElementById('wt-rotopax-val').textContent =
+    rotoWater ? '2.0 gal' : '0 gal water';
+  document.getElementById('wt-src-total').textContent = totalW.toFixed(1)+' gal';
+
+  document.getElementById('wt-drink-lbl').textContent  = `Drinking (${g.guests}p × 1.0 gal)`;
+  document.getElementById('wt-drink-val').textContent  = drink.toFixed(1)+' gal';
+  document.getElementById('wt-cook-lbl').textContent   = `Cooking & cleaning (${g.guests}p × 0.5)`;
+  document.getElementById('wt-cook-val').textContent   = cook.toFixed(1)+' gal';
+  document.getElementById('wt-shower-row').style.display = g.showShower ? '' : 'none';
+  if (g.showShower)
+    document.getElementById('wt-shower-lbl').textContent = `Shower (${g.guests}p × 0.75 gal)`;
+  document.getElementById('wt-total-day').textContent  = perDay.toFixed(2)+' gal/day';
+
+  const daysEl = document.getElementById('wt-days-num');
+  daysEl.textContent = days.toFixed(1);
+  daysEl.style.color = days>=3?'var(--green)':days>=1.5?'var(--amber)':'var(--red)';
+
+  document.getElementById('wt-trip-lbl').textContent   = `Trip (${g.tripDays}d × ${perDay.toFixed(2)} gal)`;
+  document.getElementById('wt-trip-need').textContent  = tripNeed.toFixed(2)+' gal needed';
+
+  const surEl = document.getElementById('wt-surplus');
+  surEl.textContent = (surplus>=0?'+':'')+surplus.toFixed(2)+' gal';
+  surEl.className   = 'calc-val '+(surplus>=0?'pos':surplus>=-1?'warn':'neg');
+
+  document.getElementById('sw-shower').className = 'sw'+(g.showShower?' on':'');
+
+  const info = document.getElementById('wt-info-card');
+  const base = '💧 <strong>Grayl GeoPress</strong> supplements from streams or questionable sources — plan to use it for daytime trail drinking to preserve your tank.<br><br>🚿 The HydroPod hand pump pressurizes in ~30 strokes. A quick rinse uses ≈0.5 gal; a full wash ≈0.75 gal. Count carefully on multi-day trips.';
+  info.innerHTML = rotoWater ? base :
+    '⛽ <strong>Rotopax in gas mode</strong> — water supply drops to the HydroPod\'s 4.8 gal, but you\'re carrying ~2 gal of reserve fuel (roughly 25–35 extra miles, terrain depending).<br><br>' + base;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER — SETTINGS WIDGETS
+// ════════════════════════════════════════════════════════════
 
 function renderSettings() {
-  const g=S.cfg;
-  document.getElementById('s-guests').textContent=g.guests;
-  document.getElementById('s-days').textContent=g.tripDays;
-  document.getElementById('rot-water').className=g.rotopax==='water'?'on':'';
-  document.getElementById('rot-gas').className=g.rotopax==='gas'?'on':'';
-  document.getElementById('sw-perm').className='sw'+(g.permissive?' on':'');
-}
-function updateSubheader() {
-  const g=S.cfg, loc=g.permissive?' &#xB7; permissive':'';
-  document.getElementById('hdr-sub').textContent=`${g.guests} ${g.guests===1?'person':'people'} &#xB7; ${g.tripDays} day${g.tripDays!==1?'s':''}${loc}`;
+  const g = S.cfg;
+  document.getElementById('s-guests').textContent = g.guests;
+  document.getElementById('s-days').textContent   = g.tripDays;
+  document.getElementById('rot-water').className  = g.rotopax==='water'?'on':'';
+  document.getElementById('rot-gas').className    = g.rotopax==='gas'?'on':'';
+  document.getElementById('sw-perm').className    = 'sw'+(g.permissive?' on':'');
+  document.getElementById('s-payload').value = g.payloadLimit;
+  document.getElementById('s-build').value   = g.buildLb;
+  document.getElementById('s-person').value  = g.personLb;
+  renderPresets();
 }
 
+function updateSubheader() {
+  const g = S.cfg;
+  const loc = g.permissive?' · permissive':'';
+  document.getElementById('hdr-sub').textContent =
+    `${g.guests} ${g.guests===1?'person':'people'} · ${g.tripDays} day${g.tripDays!==1?'s':''}${loc}`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  PRESETS + BACKUP
+// ════════════════════════════════════════════════════════════
+
+function renderPresets() {
+  const el = document.getElementById('preset-list');
+  if (!S.presets.length) {
+    el.innerHTML = '<div class="popup-empty" style="padding:12px 14px">No presets yet — dial in settings, then save them with a name like “Solo weekend”.</div>';
+    return;
+  }
+  el.innerHTML = S.presets.map((p,i) => `
+    <div class="preset-row">
+      <span class="preset-name">${p.name}</span>
+      <button class="small-btn" onclick="applyPreset(${i})">Apply</button>
+      <button class="small-btn danger" onclick="deletePreset(${i})">✕</button>
+    </div>`).join('');
+}
+
+function savePreset() {
+  const name = prompt('Name this preset:', `${S.cfg.guests}p · ${S.cfg.tripDays} days`);
+  if (!name) return;
+  S.presets.push({ name, cfg: { ...S.cfg } });
+  save(); renderPresets();
+}
+
+function applyPreset(i) {
+  S.cfg = { ...DEFAULTS, ...S.presets[i].cfg };
+  save(); renderAll(); renderSettings();
+}
+
+function deletePreset(i) {
+  S.presets.splice(i,1);
+  save(); renderPresets();
+}
+
+function exportState() {
+  const data = JSON.stringify({ checked:S.checked, cfg:S.cfg, presets:S.presets });
+  const msg = document.getElementById('backup-msg');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(data).then(
+      () => { msg.textContent = 'Copied to clipboard ✓'; },
+      () => { prompt('Copy this backup:', data); }
+    );
+  } else {
+    prompt('Copy this backup:', data);
+  }
+}
+
+function importState() {
+  const data = prompt('Paste a backup:');
+  if (!data) return;
+  try {
+    const d = JSON.parse(data);
+    if (d.checked) S.checked = d.checked;
+    if (d.cfg) S.cfg = { ...DEFAULTS, ...d.cfg };
+    if (d.presets) S.presets = d.presets;
+    save(); renderAll(); renderSettings();
+    document.getElementById('backup-msg').textContent = 'Imported ✓';
+  } catch(e) {
+    document.getElementById('backup-msg').textContent = 'Invalid backup';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  INTERACTIONS
+// ════════════════════════════════════════════════════════════
+
 function toggleSec(id) {
-  const el=document.getElementById('sec-'+id);
+  const el = document.getElementById('sec-'+id);
   if (openSecs.has(id)) { openSecs.delete(id); el.classList.remove('open'); }
-  else { openSecs.add(id); el.classList.add('open'); }
+  else                  { openSecs.add(id);    el.classList.add('open');    }
   save();
 }
+
 function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.tab-btn') .forEach(el=>el.classList.remove('on'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.querySelector(`[data-tab="${tab}"]`).classList.add('on');
 }
+
 function adj(key, delta) {
-  const mins={guests:1,tripDays:1}, maxs={guests:8,tripDays:14};
-  S.cfg[key]=Math.max(mins[key],Math.min(maxs[key],S.cfg[key]+delta));
-  document.getElementById('s-'+{guests:'guests',tripDays:'days'}[key]).textContent=S.cfg[key];
+  const mins = {guests:1, tripDays:1};
+  const maxs = {guests:8, tripDays:14};
+  S.cfg[key] = Math.max(mins[key], Math.min(maxs[key], S.cfg[key]+delta));
+  document.getElementById('s-'+{guests:'guests',tripDays:'days'}[key]).textContent = S.cfg[key];
   save(); renderAll();
 }
-function setRotopax(mode) {
-  S.cfg.rotopax=mode;
-  document.getElementById('rot-water').className=mode==='water'?'on':'';
-  document.getElementById('rot-gas').className=mode==='gas'?'on':'';
-  save(); renderChecklist();
-}
-function toggle(key) { S.cfg[key]=!S.cfg[key]; save(); renderAll(); }
-function setACMode(mode) { S.cfg.acMode=mode; save(); renderPower(); }
-function openModal() { document.getElementById('modal').classList.add('open'); renderSettings(); }
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
-function modalBgClick(e) { if (e.target===document.getElementById('modal')) closeModal(); }
-function doReset() {
-  if (!confirm('Reset all checks for a new trip?\n\nSettings will be kept.')) return;
-  S.checked={}; save(); renderAll();
+
+function setNum(key, input) {
+  const v = parseInt(input.value, 10);
+  if (!isNaN(v) && v > 0) { S.cfg[key] = v; save(); renderAll(); }
+  else input.value = S.cfg[key];
 }
 
-function renderAll() { renderChecklist(); renderPower(); renderWater(); renderSettings(); refreshHeader(); refreshBedBadges(); updateSubheader(); }
-load(); renderAll();
+function setRotopax(mode) {
+  S.cfg.rotopax = mode;
+  document.getElementById('rot-water').className = mode==='water'?'on':'';
+  document.getElementById('rot-gas').className   = mode==='gas'  ?'on':'';
+  save(); renderAll();
+}
+
+function toggle(key) {
+  S.cfg[key] = !S.cfg[key];
+  save(); renderAll();
+}
+
+function setACMode(mode) {
+  S.cfg.acMode = mode;
+  save(); renderPower(); renderZonePopup();
+}
+
+function openModal()  { document.getElementById('modal').classList.add('open'); renderSettings(); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function modalBgClick(e) { if (e.target===document.getElementById('modal')) closeModal(); }
+
+function doReset() {
+  if (!confirm('Reset all checks for a new trip?\n\nSettings will be kept.')) return;
+  S.checked = {};
+  save(); renderAll();
+}
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+
+function renderAll() {
+  renderPhaseSeg();
+  renderChecklist();
+  renderPower();
+  renderWater();
+  renderPayload();
+  refreshHeader();
+  refreshBedBadges();
+  updateSubheader();
+  // keep an open zone popup in sync with settings changes (bug fix)
+  if (activeZone) {
+    const sec = SECTIONS.find(s=>s.zone===activeZone||s.id===activeZone);
+    if (sec) renderZonePopup(); else closeZonePopup();
+  }
+}
+
+load();
+buildBedSVG();
+renderAll();
+
+// offline support — no-op on file:// or unsupported browsers
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
