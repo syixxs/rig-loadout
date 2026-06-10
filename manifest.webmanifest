@@ -1,0 +1,14 @@
+{
+  "name": "Rig Loadout — Gladiator",
+  "short_name": "Rig Loadout",
+  "description": "Trip-prep checklist, bed map, power and water planning for the Gladiator overland build",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1c1c1e",
+  "theme_color": "#1c1c1e",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
