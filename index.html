@@ -635,12 +635,12 @@
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  BED + GEAR DATA — real-world dimensions (inches / lb)
 //  Bed: Jeep Gladiator JT 5-ft box. Interior 60.3"L × 56.8"W,
 //  45.8" between wheel wells (tape-measured 5.5" wide, 31" long, starting
 //  at the cab wall), 17.5" deep, Leitner ACS bars +23" above rails.
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const SCALE = 5; // px per inch
 const BED = { L:60.3, W:56.8, wellW:5.5, wellY:0, wellL:31, depth:17.5 };
@@ -661,9 +661,9 @@ const MAP_ITEMS = [
   { id:'m_wood',    zone:'fire',          name:'WOOD BAG — off the gate', sub:'', w:16,   l:5,  x:38,   y:61.3, h:10,   lb:40, est:true, fill:'none', tcol:'#d8a070', dashed:true },
 ];
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  CHECKLIST DATA — phase: depart (default) | camp | packout
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const SECTIONS = [
   { id:'rack', icon:'🔧', name:'Rack Check',
@@ -793,9 +793,9 @@ const PHASES = [
   { id:'packout', lbl:'📦 Pack-Out' },
 ];
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  STATE
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const DEFAULTS = {
   guests:1, tripDays:2, permissive:false, rotopax:'water',
@@ -830,9 +830,9 @@ function save() {
   })); } catch(e){}
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  ITEM RESOLUTION
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 function dynOK(it) {
   if (it.dynamic === 'perm')   return S.cfg.permissive;
@@ -868,9 +868,9 @@ function phaseProgress(phase) {
   return { done, total };
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  RENDER — PHASES + CHECKLIST
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 function renderPhaseSeg() {
   const seg = document.getElementById('phase-seg');
@@ -968,9 +968,9 @@ function refreshHeader() {
   document.getElementById('hdr-pct-lbl').textContent = lbls[activePhase];
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  RENDER — BED MAP (to-scale, data-driven)
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const OX = 10, OY = 44;                       // bed origin px (walls/cab band)
 const BW = BED.W*SCALE, BL = BED.L*SCALE;     // 284 × 301.5
@@ -1140,9 +1140,9 @@ function closeZonePopup() {
   document.getElementById('zone-popup').style.display='none';
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  RENDER — PAYLOAD
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const LB_PER_GAL_WATER = 8.34;
 const LB_PER_GAL_GAS = 6.3;
@@ -1188,9 +1188,9 @@ function renderPayload() {
   document.getElementById('pl-limit-lbl').textContent = `limit ${g.payloadLimit.toLocaleString()} lb`;
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  RENDER — POWER
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const FRIDGE_WH  = 1080;  // 45W × 24h
 const PHONE_WH   = 40;    // per person/day
@@ -1319,9 +1319,9 @@ function renderProjection(drawDay1, drawSteady) {
   }
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  RENDER — WATER
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 const HYDROPOD = 4.8;
 const ROTOPAX_GAL = 2.0;
@@ -1376,9 +1376,9 @@ function renderWater() {
     '⛽ <strong>Rotopax in gas mode</strong> — water supply drops to the HydroPod\'s 4.8 gal, but you\'re carrying ~2 gal of reserve fuel (roughly 25–35 extra miles, terrain depending).<br><br>' + base;
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  RENDER — SETTINGS WIDGETS
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 function renderSettings() {
   const g = S.cfg;
@@ -1400,9 +1400,9 @@ function updateSubheader() {
     `${g.guests} ${g.guests===1?'person':'people'} · ${g.tripDays} day${g.tripDays!==1?'s':''}${loc}`;
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  PRESETS + BACKUP
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 function renderPresets() {
   const el = document.getElementById('preset-list');
@@ -1463,9 +1463,9 @@ function importState() {
   }
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  INTERACTIONS
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 function toggleSec(id) {
   const el = document.getElementById('sec-'+id);
@@ -1522,9 +1522,9 @@ function doReset() {
   save(); renderAll();
 }
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  INIT
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 
 function renderAll() {
   renderPhaseSeg();
